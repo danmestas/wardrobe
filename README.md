@@ -10,6 +10,10 @@ Skills follow the Agent Skills format.
 
 Use when working with Atlassian CLI (acli) to install, authenticate, and manage Jira Cloud work items/issues from the command line.
 
+### linear-method
+
+Use when creating, organizing, or prioritizing issues in Linear. Covers the Linear Method best practices: issue writing, priority levels, enablers vs blockers, hierarchy, cycles, workflows, labels, relations, backlog hygiene, and project scoping.
+
 ## Installation
 
 Install all skills from this repo:
