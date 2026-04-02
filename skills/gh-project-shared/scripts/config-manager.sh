@@ -38,6 +38,19 @@ get_project_config() {
 
 save_project_config() {
   local project_data=$1
+
+  # Validate input
+  if [ -z "$project_data" ]; then
+    echo "Error: project_data cannot be empty" >&2
+    return 1
+  fi
+
+  # Validate JSON format
+  if ! echo "$project_data" | jq empty 2>/dev/null; then
+    echo "Error: project_data is not valid JSON" >&2
+    return 1
+  fi
+
   mkdir -p .github
   if [ ! -f "$CONFIG_FILE" ]; then
     echo '{"version": "1.0", "projects": []}' > "$CONFIG_FILE"
@@ -83,6 +96,10 @@ validate_config_file() {
 get_field_id() {
   local project_num=$1
   local field_name=$2
+  if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Error: Config file not found: $CONFIG_FILE" >&2
+    return 1
+  fi
   local field_key="${field_name}_field_id"
   local field_id
   field_id=$(jq -r --argjson num "$project_num" --arg key "$field_key" \
@@ -99,6 +116,10 @@ get_field_option_id() {
   local project_num=$1
   local field_name=$2
   local option_name=$3
+  if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Error: Config file not found: $CONFIG_FILE" >&2
+    return 1
+  fi
   local option_id
   option_id=$(jq -r --argjson num "$project_num" --arg fn "$field_name" --arg on "$option_name" \
     '.projects[] | select(.number == $num) | .field_options[$fn][$on]' "$CONFIG_FILE")
