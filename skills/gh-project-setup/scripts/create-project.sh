@@ -37,10 +37,11 @@ OWNER_TYPE="user"
 if [ "$OWNER" != "@me" ]; then
   # Issue 5 fix: Check if API call succeeded before proceeding
   API_RESPONSE=$(gh api "/users/$OWNER" 2>/dev/null)
-  if [ $? -eq 0 ] && echo "$API_RESPONSE" | jq -e '.type == "Organization"' >/dev/null 2>&1; then
+  API_EXIT=$?
+  if [ $API_EXIT -eq 0 ] && echo "$API_RESPONSE" | jq -e '.type == "Organization"' >/dev/null 2>&1; then
     OWNER_TYPE="org"
     echo "Creating organization project for $OWNER" >&2
-  elif [ $? -ne 0 ]; then
+  elif [ $API_EXIT -ne 0 ]; then
     echo "Warning: Unable to verify owner '$OWNER', assuming user type" >&2
   fi
 fi
