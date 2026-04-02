@@ -36,11 +36,15 @@ detect_repo_type() {
 
 # Helper function to cap score at 100
 cap_score() {
-  local score=$1
-  if [ $score -gt 100 ]; then
+  local score=${1:-0}
+  if ! [[ "$score" =~ ^[0-9]+$ ]]; then
+    echo 0
+    return
+  fi
+  if [ "$score" -gt 100 ]; then
     echo 100
   else
-    echo $score
+    echo "$score"
   fi
 }
 
