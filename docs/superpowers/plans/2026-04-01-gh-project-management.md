@@ -3884,7 +3884,7 @@ test_populate_template() {
 
 # Test: add_changelog_entry
 test_add_changelog_entry() {
-  echo -e "# Charter\n\n## Changelog\n" > /tmp/test-charter.md
+  echo -e "# Charter\n\n## Change Log\n" > /tmp/test-charter.md
   
   add_changelog_entry "/tmp/test-charter.md" "Scope expanded"
   
@@ -4030,7 +4030,7 @@ Old purpose
 ### Out of Scope
 - Item A
 
-## Changelog
+## Change Log
 EOF
 }
 
