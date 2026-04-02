@@ -2043,10 +2043,10 @@ for field in $FIELDS; do
     FIELD_ID=$(echo "$FIELD_JSON" | jq -r '.id')
     FIELD_IDS[$field]=$FIELD_ID
 
-    # Store option IDs
-    echo "$FIELD_JSON" | jq -r '.options[]? | "\(.name)|\(.id)"' | while IFS='|' read -r opt_name opt_id; do
+    # Store option IDs (use process substitution to avoid subshell)
+    while IFS='|' read -r opt_name opt_id; do
       FIELD_OPTIONS["${field,,}_$opt_name"]=$opt_id
-    done
+    done < <(echo "$FIELD_JSON" | jq -r '.options[]? | "\(.name)|\(.id)"')
 
   elif [ "$field" = "Status" ]; then
     # Built-in Status field - get existing field ID
@@ -2054,13 +2054,11 @@ for field in $FIELDS; do
     STATUS_FIELD_ID=$(gh project field-list "$PROJECT_NUM" --owner "$OWNER" --format json | jq -r '.fields[] | select(.name == "Status") | .id')
     FIELD_IDS[Status]=$STATUS_FIELD_ID
 
-    # Get Status field options
-    gh project field-list "$PROJECT_NUM" --owner "$OWNER" --format json | \
-      jq -r '.fields[] | select(.name == "Status") | .options[]? | "\(.name)|\(.id)"' | \
-      while IFS='|' read -r opt_name opt_id; do
-        # Store as lowercase for consistency
-        FIELD_OPTIONS["status_${opt_name,,}"]=$opt_id
-      done
+    # Get Status field options (use process substitution to avoid subshell)
+    while IFS='|' read -r opt_name opt_id; do
+      FIELD_OPTIONS["status_${opt_name,,}"]=$opt_id
+    done < <(gh project field-list "$PROJECT_NUM" --owner "$OWNER" --format json | \
+      jq -r '.fields[] | select(.name == "Status") | .options[]? | "\(.name)|\(.id)"')
 
   else
     # Standard field to create
@@ -2088,10 +2086,10 @@ for field in $FIELDS; do
     FIELD_ID=$(echo "$FIELD_JSON" | jq -r '.id')
     FIELD_IDS[$field]=$FIELD_ID
 
-    # Store option IDs
-    echo "$FIELD_JSON" | jq -r '.options[]? | "\(.name)|\(.id)"' | while IFS='|' read -r opt_name opt_id; do
+    # Store option IDs (use process substitution to avoid subshell)
+    while IFS='|' read -r opt_name opt_id; do
       FIELD_OPTIONS["${field,,}_${opt_name,,}"]=$opt_id
-    done
+    done < <(echo "$FIELD_JSON" | jq -r '.options[]? | "\(.name)|\(.id)"')
   fi
 done
 
@@ -2102,6 +2100,7 @@ CONFIG_DATA=$(jq -n \
   --arg title "$(gh project view "$PROJECT_NUM" --owner "$OWNER" --format json | jq -r '.title')" \
   --arg owner "$OWNER" \
   --arg template "$TEMPLATE_NAME" \
+  --arg repos "${REPOS:-$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || echo '')}" \
   --arg created "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
   '{
     id: $id,
@@ -2109,7 +2108,7 @@ CONFIG_DATA=$(jq -n \
     title: $title,
     owner: $owner,
     template: $template,
-    linked_repos: [],
+    linked_repos: ($repos | split(",") | map(select(. != ""))),
     created_at: $created,
     fields: {},
     field_options: {},
@@ -3741,11 +3740,11 @@ test_template_sections() {
 test_template_changelog() {
   CONTENT=$(cat skills/gh-project-charter/templates/charter-minimal.md)
   
-  if echo "$CONTENT" | grep -q "## Changelog"; then
+  if echo "$CONTENT" | grep -q "## Change Log"; then
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))
-    echo "FAIL: Should have Changelog section"
+    echo "FAIL: Should have Change Log section"
   fi
 }
 
@@ -3943,17 +3942,20 @@ populate_template() {
     sed "s/{{PROJECT_NUM}}/$project_num/g"
 }
 
-# Add changelog entry
+# Add changelog entry (portable - no sed -i)
 # Args: charter_file, entry
 add_changelog_entry() {
   local charter_file="$1"
   local entry="$2"
   local date=$(date +%Y-%m-%d)
   
-  # Insert before last line
-  sed -i '' -e "\$i\\
-### $date - $entry
-" "$charter_file"
+  # Find "## Change Log" and append entry after it
+  awk -v entry="### $date - $entry" '
+    /^## Change Log/ { print; getline; print; print entry; next }
+    { print }
+  ' "$charter_file" > "${charter_file}.tmp"
+  
+  mv "${charter_file}.tmp" "$charter_file"
 }
 ```
 
@@ -4094,7 +4096,9 @@ echo "Tests: $PASS passed, $FAIL failed"
 Run: `bash skills/gh-project-charter/tests/test-charter-sections.sh`
 Expected: FAIL with "source: no such file"
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 3: Write working implementation**
+
+Note: Unlike other tasks, the tests here check actual file modifications, so stubs won't pass. Write the real implementation directly.
 
 ```bash
 #!/bin/bash
@@ -4107,6 +4111,25 @@ update_section() {
   local section_name="$2"
   local new_content="$3"
   
+  if [ ! -f "$charter_file" ]; then
+    echo "ERROR: Charter file not found: $charter_file" >&2
+    return 1
+  fi
+  
+  awk -v section="## $section_name" -v content="$new_content" '
+    BEGIN { in_section = 0 }
+    $0 ~ section { 
+      print $0
+      print content
+      print ""
+      in_section = 1
+      next
+    }
+    /^## / && in_section { in_section = 0 }
+    !in_section { print }
+  ' "$charter_file" > "${charter_file}.tmp"
+  
+  mv "${charter_file}.tmp" "$charter_file"
   echo "Updated section: $section_name"
 }
 
@@ -4117,7 +4140,66 @@ add_to_section() {
   local section_name="$2"
   local content="$3"
   
+  if [ ! -f "$charter_file" ]; then
+    echo "ERROR: Charter file not found: $charter_file" >&2
+    return 1
+  fi
+  
+  awk -v section="### $section_name" -v content="$content" '
+    BEGIN { in_section = 0 }
+    $0 ~ section { in_section = 1 }
+    /^###/ && in_section && $0 !~ section { 
+      print content
+      in_section = 0
+    }
+    /^##/ && !/^###/ && in_section {
+      print content
+      print ""
+      in_section = 0
+    }
+    { print }
+    END { if (in_section) print content }
+  ' "$charter_file" > "${charter_file}.tmp"
+  
+  mv "${charter_file}.tmp" "$charter_file"
   echo "Added to section: $section_name"
+}
+
+# Add new section to charter (before Change Log)
+# Args: charter_file, section_name, content
+add_new_section() {
+  local charter_file="$1"
+  local section_name="$2"
+  local content="$3"
+  
+  if [ ! -f "$charter_file" ]; then
+    echo "ERROR: Charter file not found: $charter_file" >&2
+    return 1
+  fi
+  
+  # Check for section template
+  local template_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../templates/section-templates" 2>/dev/null && pwd)"
+  local template_file="$template_dir/$(echo "$section_name" | tr '[:upper:] ' '[:lower:]-' | tr -d '&').md"
+  
+  local section_content="$content"
+  if [ -f "$template_file" ]; then
+    section_content=$(cat "$template_file")
+    [ -n "$content" ] && section_content="$content"
+  fi
+  
+  awk -v section="## $section_name" -v content="$section_content" '
+    /^## Change Log/ {
+      print section
+      print content
+      print ""
+      print "---"
+      print ""
+    }
+    { print }
+  ' "$charter_file" > "${charter_file}.tmp"
+  
+  mv "${charter_file}.tmp" "$charter_file"
+  echo "Added section: $section_name"
 }
 
 # Get section content
@@ -4145,30 +4227,23 @@ git commit -m "test: add section manager tests
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 ```
 
-- [ ] **Step 6: Implement update_section and add_to_section**
+- [ ] **Step 6: Verify all functions work with edge cases**
 
-Edit: `skills/gh-project-charter/scripts/charter-sections.sh`
+Step 3 already includes the full AWK implementations. Run additional manual tests:
 
-Add complete AWK-based implementations for:
+```bash
+# Test update_section with multi-line content
+source skills/gh-project-charter/scripts/charter-sections.sh
+echo -e "# Test\n## Goals\nOld\n## Scope\nStuff" > /tmp/test.md
+update_section /tmp/test.md "Goals" "Line 1\nLine 2"
+cat /tmp/test.md  # Should show new content under Goals, Scope preserved
 
-**update_section(charter_file, section_name, new_content):**
-1. Use AWK to find `## $section_name` header
-2. Print header, then print new_content
-3. Skip all lines until next `## ` header
-4. Continue printing rest of file
-5. Write to temp file, then `mv` back
-
-**add_to_section(charter_file, section_name, content):**
-1. Use AWK to find `### $section_name` subsection header
-2. Track when inside target section
-3. When next `###` or `##` found, insert content before it
-4. Write to temp file, then `mv` back
-
-**add_new_section(charter_file, section_name, content):**
-1. Find `## Change Log` header (always last core section)
-2. Insert new `## $section_name` + content before Change Log
-3. If section-template exists in `templates/section-templates/`, use it as base
-4. Write to temp file, then `mv` back
+# Test add_new_section
+echo -e "# Test\n## Goals\nGoals here\n## Change Log\nLog here" > /tmp/test.md
+add_new_section /tmp/test.md "Risks" "Risk 1"
+cat /tmp/test.md  # Should have Risks section before Change Log
+rm /tmp/test.md
+```
 
 - [ ] **Step 7: Commit implementations**
 
@@ -4366,7 +4441,7 @@ esac
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `bash skills/gh-project-charter/tests/test-charter-entry.sh`
-Expected: PASS - All 4 tests pass
+Expected: PASS - All 6 tests pass
 
 - [ ] **Step 5: Commit**
 
