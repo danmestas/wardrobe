@@ -2362,16 +2362,16 @@ Next: Chunk 3 (gh-project-operations)
 ### Task 14: Create Issue Operations Script
 
 **Files:**
-- Create: `skills/gh-project-operations/lib/issue-ops.sh`
-- Test: `skills/gh-project-operations/tests/test-issue-ops.sh`
+- Create: `skills/gh-project-operations/scripts/issue-crud.sh`
+- Test: `skills/gh-project-operations/tests/test-issue-crud.sh`
 
 - [ ] **Step 1: Write the failing test**
 
 ```bash
 #!/bin/bash
-# skills/gh-project-operations/tests/test-issue-ops.sh
+# skills/gh-project-operations/tests/test-issue-crud.sh
 
-source "$(dirname "$0")/../lib/issue-ops.sh"
+source "$(dirname "$0")/../lib/issue-crud.sh"
 
 PASS=0
 FAIL=0
@@ -2444,14 +2444,14 @@ echo "Tests: $PASS passed, $FAIL failed"
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `bash skills/gh-project-operations/tests/test-issue-ops.sh`
+Run: `bash skills/gh-project-operations/tests/test-issue-crud.sh`
 Expected: FAIL with "source: no such file"
 
 - [ ] **Step 3: Write minimal implementation**
 
 ```bash
 #!/bin/bash
-# skills/gh-project-operations/lib/issue-ops.sh
+# skills/gh-project-operations/scripts/issue-crud.sh
 
 # Create a new issue
 # Args: title, body, labels, assignee
@@ -2522,14 +2522,14 @@ delete_issue() {
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `bash skills/gh-project-operations/tests/test-issue-ops.sh`
+Run: `bash skills/gh-project-operations/tests/test-issue-crud.sh`
 Expected: PASS - All 5 tests pass
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/gh-project-operations/lib/issue-ops.sh \
-  skills/gh-project-operations/tests/test-issue-ops.sh
+git add skills/gh-project-operations/scripts/issue-crud.sh \
+  skills/gh-project-operations/tests/test-issue-crud.sh
 git commit -m "test: add issue operations tests
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -2545,11 +2545,11 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 # delete_issue: eval "$cmd" 2>&1
 ```
 
-Edit: `skills/gh-project-operations/lib/issue-ops.sh`
+Edit: `skills/gh-project-operations/scripts/issue-crud.sh`
 
 ```bash
 #!/bin/bash
-# skills/gh-project-operations/lib/issue-ops.sh
+# skills/gh-project-operations/scripts/issue-crud.sh
 
 create_issue() {
   local title="$1"
@@ -2613,7 +2613,7 @@ delete_issue() {
 - [ ] **Step 7: Commit implementation**
 
 ```bash
-git add skills/gh-project-operations/lib/issue-ops.sh
+git add skills/gh-project-operations/scripts/issue-crud.sh
 git commit -m "feat: implement issue CRUD operations
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -2624,16 +2624,16 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 ### Task 15: Create Item Management Script
 
 **Files:**
-- Create: `skills/gh-project-operations/lib/item-manager.sh`
-- Test: `skills/gh-project-operations/tests/test-item-manager.sh`
+- Create: `skills/gh-project-operations/scripts/item-management.sh`
+- Test: `skills/gh-project-operations/tests/test-item-management.sh`
 
 - [ ] **Step 1: Write the failing test**
 
 ```bash
 #!/bin/bash
-# skills/gh-project-operations/tests/test-item-manager.sh
+# skills/gh-project-operations/tests/test-item-management.sh
 
-source "$(dirname "$0")/../lib/item-manager.sh"
+source "$(dirname "$0")/../lib/item-management.sh"
 source "$(dirname "$0")/../../gh-project-shared/lib/config-manager.sh"
 
 PASS=0
@@ -2744,14 +2744,14 @@ echo "Tests: $PASS passed, $FAIL failed"
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `bash skills/gh-project-operations/tests/test-item-manager.sh`
+Run: `bash skills/gh-project-operations/tests/test-item-management.sh`
 Expected: FAIL with "source: no such file"
 
 - [ ] **Step 3: Write minimal implementation**
 
 ```bash
 #!/bin/bash
-# skills/gh-project-operations/lib/item-manager.sh
+# skills/gh-project-operations/scripts/item-management.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../gh-project-shared/lib/config-manager.sh"
@@ -2816,14 +2816,14 @@ list_project_items() {
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `bash skills/gh-project-operations/tests/test-item-manager.sh`
+Run: `bash skills/gh-project-operations/tests/test-item-management.sh`
 Expected: PASS - All 7 tests pass
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/gh-project-operations/lib/item-manager.sh \
-  skills/gh-project-operations/tests/test-item-manager.sh
+git add skills/gh-project-operations/scripts/item-management.sh \
+  skills/gh-project-operations/tests/test-item-management.sh
 git commit -m "test: add item management tests
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -2831,11 +2831,11 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 - [ ] **Step 6: Implement actual execution**
 
-Edit: `skills/gh-project-operations/lib/item-manager.sh`
+Edit: `skills/gh-project-operations/scripts/item-management.sh`
 
 ```bash
 #!/bin/bash
-# skills/gh-project-operations/lib/item-manager.sh
+# skills/gh-project-operations/scripts/item-management.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../gh-project-shared/lib/config-manager.sh"
@@ -2893,7 +2893,7 @@ list_project_items() {
 - [ ] **Step 7: Commit implementation**
 
 ```bash
-git add skills/gh-project-operations/lib/item-manager.sh
+git add skills/gh-project-operations/scripts/item-management.sh
 git commit -m "feat: implement item management operations
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -2904,16 +2904,16 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 ### Task 16: Create Bulk Operations Script
 
 **Files:**
-- Create: `skills/gh-project-operations/lib/bulk-ops.sh`
-- Test: `skills/gh-project-operations/tests/test-bulk-ops.sh`
+- Create: `skills/gh-project-operations/scripts/bulk-operations.sh`
+- Test: `skills/gh-project-operations/tests/test-bulk-operations.sh`
 
 - [ ] **Step 1: Write the failing test**
 
 ```bash
 #!/bin/bash
-# skills/gh-project-operations/tests/test-bulk-ops.sh
+# skills/gh-project-operations/tests/test-bulk-operations.sh
 
-source "$(dirname "$0")/../lib/bulk-ops.sh"
+source "$(dirname "$0")/../lib/bulk-operations.sh"
 
 PASS=0
 FAIL=0
@@ -2998,18 +2998,18 @@ echo "Tests: $PASS passed, $FAIL failed"
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `bash skills/gh-project-operations/tests/test-bulk-ops.sh`
+Run: `bash skills/gh-project-operations/tests/test-bulk-operations.sh`
 Expected: FAIL with "source: no such file"
 
 - [ ] **Step 3: Write minimal implementation**
 
 ```bash
 #!/bin/bash
-# skills/gh-project-operations/lib/bulk-ops.sh
+# skills/gh-project-operations/scripts/bulk-operations.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/issue-ops.sh"
-source "$SCRIPT_DIR/item-manager.sh"
+source "$SCRIPT_DIR/issue-crud.sh"
+source "$SCRIPT_DIR/item-management.sh"
 
 # Bulk create issues
 # Args: mode (array|csv|json), data
@@ -3062,14 +3062,14 @@ export_to_csv() {
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `bash skills/gh-project-operations/tests/test-bulk-ops.sh`
+Run: `bash skills/gh-project-operations/tests/test-bulk-operations.sh`
 Expected: PASS - All 5 tests pass
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/gh-project-operations/lib/bulk-ops.sh \
-  skills/gh-project-operations/tests/test-bulk-ops.sh
+git add skills/gh-project-operations/scripts/bulk-operations.sh \
+  skills/gh-project-operations/tests/test-bulk-operations.sh
 git commit -m "test: add bulk operations tests
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -3077,7 +3077,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 - [ ] **Step 6: Implement batch mode (array)**
 
-Edit: `skills/gh-project-operations/lib/bulk-ops.sh`
+Edit: `skills/gh-project-operations/scripts/bulk-operations.sh`
 
 ```bash
 bulk_create_issues() {
@@ -3108,13 +3108,13 @@ bulk_create_issues() {
 
 - [ ] **Step 7: Run test to verify batch mode**
 
-Run: `bash skills/gh-project-operations/tests/test-bulk-ops.sh`
+Run: `bash skills/gh-project-operations/tests/test-bulk-operations.sh`
 Expected: PASS - batch mode test passes
 
 - [ ] **Step 8: Commit batch mode**
 
 ```bash
-git add skills/gh-project-operations/lib/bulk-ops.sh
+git add skills/gh-project-operations/scripts/bulk-operations.sh
 git commit -m "feat: implement bulk create (batch mode)
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -3122,7 +3122,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 - [ ] **Step 9: Implement CSV mode**
 
-Edit: `skills/gh-project-operations/lib/bulk-ops.sh`
+Edit: `skills/gh-project-operations/scripts/bulk-operations.sh`
 
 ```bash
 bulk_create_issues() {
@@ -3185,7 +3185,7 @@ import_from_csv() {
 - [ ] **Step 10: Commit CSV mode**
 
 ```bash
-git add skills/gh-project-operations/lib/bulk-ops.sh
+git add skills/gh-project-operations/scripts/bulk-operations.sh
 git commit -m "feat: implement bulk create (CSV mode)
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -3193,7 +3193,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 - [ ] **Step 11: Implement query-based operations**
 
-Edit: `skills/gh-project-operations/lib/bulk-ops.sh`
+Edit: `skills/gh-project-operations/scripts/bulk-operations.sh`
 
 ```bash
 bulk_update_status() {
@@ -3238,7 +3238,7 @@ bulk_archive_completed() {
 - [ ] **Step 12: Commit query operations**
 
 ```bash
-git add skills/gh-project-operations/lib/bulk-ops.sh
+git add skills/gh-project-operations/scripts/bulk-operations.sh
 git commit -m "feat: implement query-based bulk operations
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -3246,7 +3246,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 - [ ] **Step 13: Implement export to CSV**
 
-Edit: `skills/gh-project-operations/lib/bulk-ops.sh`
+Edit: `skills/gh-project-operations/scripts/bulk-operations.sh`
 
 ```bash
 export_to_csv() {
@@ -3270,7 +3270,7 @@ export_to_csv() {
 - [ ] **Step 14: Commit export**
 
 ```bash
-git add skills/gh-project-operations/lib/bulk-ops.sh
+git add skills/gh-project-operations/scripts/bulk-operations.sh
 git commit -m "feat: implement CSV export
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -3363,9 +3363,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../gh-project-shared/lib/gh-check.sh"
 source "$SCRIPT_DIR/../gh-project-shared/lib/gh-auth.sh"
-source "$SCRIPT_DIR/lib/issue-ops.sh"
-source "$SCRIPT_DIR/lib/item-manager.sh"
-source "$SCRIPT_DIR/lib/bulk-ops.sh"
+source "$SCRIPT_DIR/lib/issue-crud.sh"
+source "$SCRIPT_DIR/lib/item-management.sh"
+source "$SCRIPT_DIR/lib/bulk-operations.sh"
 
 show_help() {
   cat <<EOF
@@ -3469,7 +3469,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 ### Task 18: Create Coordination Logic
 
 **Files:**
-- Create: `skills/gh-project-operations/lib/coordinator.sh`
+- Create: `skills/gh-project-operations/scripts/coordinator.sh`
 - Test: `skills/gh-project-operations/tests/test-coordinator.sh`
 
 - [ ] **Step 1: Write the failing test**
@@ -3546,7 +3546,7 @@ Expected: FAIL with "source: no such file"
 
 ```bash
 #!/bin/bash
-# skills/gh-project-operations/lib/coordinator.sh
+# skills/gh-project-operations/scripts/coordinator.sh
 
 # Detect if an operation suggests scope change
 # Args: operation_type, value
@@ -3593,7 +3593,7 @@ Expected: PASS - All 4 tests pass
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/gh-project-operations/lib/coordinator.sh \
+git add skills/gh-project-operations/scripts/coordinator.sh \
   skills/gh-project-operations/tests/test-coordinator.sh
 git commit -m "test: add coordination logic tests
 
@@ -3672,7 +3672,7 @@ Next: Chunk 4 (gh-project-charter)
 ### Task 20: Create Charter Template
 
 **Files:**
-- Create: `skills/gh-project-charter/templates/charter-template.md`
+- Create: `skills/gh-project-charter/templates/charter-minimal.md`
 - Test: `skills/gh-project-charter/tests/test-template.sh`
 
 - [ ] **Step 1: Write the failing test**
@@ -3686,7 +3686,7 @@ FAIL=0
 
 # Test: template exists
 test_template_exists() {
-  if [ -f "skills/gh-project-charter/templates/charter-template.md" ]; then
+  if [ -f "skills/gh-project-charter/templates/charter-minimal.md" ]; then
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))
@@ -3696,7 +3696,7 @@ test_template_exists() {
 
 # Test: has required sections
 test_template_sections() {
-  CONTENT=$(cat skills/gh-project-charter/templates/charter-template.md)
+  CONTENT=$(cat skills/gh-project-charter/templates/charter-minimal.md)
   
   if echo "$CONTENT" | grep -q "## Purpose"; then
     PASS=$((PASS + 1))
@@ -3722,7 +3722,7 @@ test_template_sections() {
 
 # Test: has changelog section
 test_template_changelog() {
-  CONTENT=$(cat skills/gh-project-charter/templates/charter-template.md)
+  CONTENT=$(cat skills/gh-project-charter/templates/charter-minimal.md)
   
   if echo "$CONTENT" | grep -q "## Changelog"; then
     PASS=$((PASS + 1))
@@ -3821,7 +3821,7 @@ Expected: FAIL with "No such file"
 - Template: gh-project-charter v1.0
 ```
 
-Save to: `skills/gh-project-charter/templates/charter-template.md`
+Save to: `skills/gh-project-charter/templates/charter-minimal.md`
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -3831,7 +3831,7 @@ Expected: PASS - All 5 tests pass
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/gh-project-charter/templates/charter-template.md \
+git add skills/gh-project-charter/templates/charter-minimal.md \
   skills/gh-project-charter/tests/test-template.sh
 git commit -m "test: add charter template tests
 
@@ -3845,7 +3845,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 ### Task 21: Create Charter Generator Script
 
 **Files:**
-- Create: `skills/gh-project-charter/lib/charter-generator.sh`
+- Create: `skills/gh-project-charter/scripts/charter-create.sh`
 - Test: `skills/gh-project-charter/tests/test-generator.sh`
 
 - [ ] **Step 1: Write the failing test**
@@ -3854,7 +3854,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 #!/bin/bash
 # skills/gh-project-charter/tests/test-generator.sh
 
-source "$(dirname "$0")/../lib/charter-generator.sh"
+source "$(dirname "$0")/../lib/charter-create.sh"
 
 PASS=0
 FAIL=0
@@ -3917,10 +3917,10 @@ Expected: FAIL with "source: no such file"
 
 ```bash
 #!/bin/bash
-# skills/gh-project-charter/lib/charter-generator.sh
+# skills/gh-project-charter/scripts/charter-create.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TEMPLATE_FILE="$SCRIPT_DIR/../templates/charter-template.md"
+TEMPLATE_FILE="$SCRIPT_DIR/../templates/charter-minimal.md"
 
 # Generate charter from template
 # Args: project_name, project_num, purpose
@@ -3965,7 +3965,7 @@ Expected: PASS - All 3 tests pass
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/gh-project-charter/lib/charter-generator.sh \
+git add skills/gh-project-charter/scripts/charter-create.sh \
   skills/gh-project-charter/tests/test-generator.sh
 git commit -m "test: add charter generator tests
 
@@ -3974,7 +3974,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 - [ ] **Step 6: Implement full generation**
 
-Edit: `skills/gh-project-charter/lib/charter-generator.sh`
+Edit: `skills/gh-project-charter/scripts/charter-create.sh`
 
 Add complete implementation that reads template, replaces all placeholders (PROJECT_NAME, PROJECT_NUM, DATE, PURPOSE_PLACEHOLDER, etc.), and writes to output file.
 
@@ -3983,7 +3983,7 @@ Full implementation available in design spec section 7.2.
 - [ ] **Step 7: Commit implementation**
 
 ```bash
-git add skills/gh-project-charter/lib/charter-generator.sh
+git add skills/gh-project-charter/scripts/charter-create.sh
 git commit -m "feat: implement full charter generation
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -3994,16 +3994,16 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 ### Task 22: Create Section Manager Script
 
 **Files:**
-- Create: `skills/gh-project-charter/lib/section-manager.sh`
-- Test: `skills/gh-project-charter/tests/test-section-manager.sh`
+- Create: `skills/gh-project-charter/scripts/charter-sections.sh`
+- Test: `skills/gh-project-charter/tests/test-charter-sections.sh`
 
 - [ ] **Step 1: Write the failing test**
 
 ```bash
 #!/bin/bash
-# skills/gh-project-charter/tests/test-section-manager.sh
+# skills/gh-project-charter/tests/test-charter-sections.sh
 
-source "$(dirname "$0")/../lib/section-manager.sh"
+source "$(dirname "$0")/../lib/charter-sections.sh"
 
 PASS=0
 FAIL=0
@@ -4086,14 +4086,14 @@ echo "Tests: $PASS passed, $FAIL failed"
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `bash skills/gh-project-charter/tests/test-section-manager.sh`
+Run: `bash skills/gh-project-charter/tests/test-charter-sections.sh`
 Expected: FAIL with "source: no such file"
 
 - [ ] **Step 3: Write minimal implementation**
 
 ```bash
 #!/bin/bash
-# skills/gh-project-charter/lib/section-manager.sh
+# skills/gh-project-charter/scripts/charter-sections.sh
 
 # Update section content (replace)
 # Args: charter_file, section_name, new_content
@@ -4127,14 +4127,14 @@ get_section() {
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `bash skills/gh-project-charter/tests/test-section-manager.sh`
+Run: `bash skills/gh-project-charter/tests/test-charter-sections.sh`
 Expected: PASS - All 3 tests pass
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add skills/gh-project-charter/lib/section-manager.sh \
-  skills/gh-project-charter/tests/test-section-manager.sh
+git add skills/gh-project-charter/scripts/charter-sections.sh \
+  skills/gh-project-charter/tests/test-charter-sections.sh
 git commit -m "test: add section manager tests
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -4142,7 +4142,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 - [ ] **Step 6: Implement update_section and add_to_section**
 
-Edit: `skills/gh-project-charter/lib/section-manager.sh`
+Edit: `skills/gh-project-charter/scripts/charter-sections.sh`
 
 Add complete AWK-based implementations for:
 - update_section: Finds section, replaces content until next section
@@ -4153,7 +4153,7 @@ Full implementation available in design spec section 7.3.
 - [ ] **Step 7: Commit implementations**
 
 ```bash
-git add skills/gh-project-charter/lib/section-manager.sh
+git add skills/gh-project-charter/scripts/charter-sections.sh
 git commit -m "feat: implement section update and append
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
@@ -4249,10 +4249,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../gh-project-shared/lib/gh-check.sh"
 source "$SCRIPT_DIR/../gh-project-shared/lib/gh-auth.sh"
-source "$SCRIPT_DIR/lib/charter-generator.sh"
-source "$SCRIPT_DIR/lib/section-manager.sh"
+source "$SCRIPT_DIR/lib/charter-create.sh"
+source "$SCRIPT_DIR/lib/charter-sections.sh"
 
-CHARTER_FILE=".github/PROJECT_CHARTER.md"
+CHARTER_FILE="docs/project-charter.md"
 
 show_help() {
   cat <<EOF
