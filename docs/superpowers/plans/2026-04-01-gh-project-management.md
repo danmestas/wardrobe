@@ -2359,7 +2359,9 @@ Next: Chunk 3 (gh-project-operations)
 
 ## Chunk 3: gh-project-operations Skill
 
-### Task 14: Create Issue Operations Script
+**Note:** Per spec section 1.4, this skill should also include `query-parser.sh` and `csv-parser.sh` as separate utility files. Current plan combines this functionality into `bulk-operations.sh`. Consider extracting query parsing and CSV parsing into separate modules during implementation for better modularity.
+
+### Task 14: Create Issue CRUD Operations Script
 
 **Files:**
 - Create: `skills/gh-project-operations/scripts/issue-crud.sh`
@@ -2371,7 +2373,7 @@ Next: Chunk 3 (gh-project-operations)
 #!/bin/bash
 # skills/gh-project-operations/tests/test-issue-crud.sh
 
-source "$(dirname "$0")/../lib/issue-crud.sh"
+source "$(dirname "$0")/../scripts/issue-crud.sh"
 
 PASS=0
 FAIL=0
@@ -2633,7 +2635,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 #!/bin/bash
 # skills/gh-project-operations/tests/test-item-management.sh
 
-source "$(dirname "$0")/../lib/item-management.sh"
+source "$(dirname "$0")/../scripts/item-management.sh"
 source "$(dirname "$0")/../../gh-project-shared/lib/config-manager.sh"
 
 PASS=0
@@ -2913,7 +2915,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 #!/bin/bash
 # skills/gh-project-operations/tests/test-bulk-operations.sh
 
-source "$(dirname "$0")/../lib/bulk-operations.sh"
+source "$(dirname "$0")/../scripts/bulk-operations.sh"
 
 PASS=0
 FAIL=0
@@ -3478,7 +3480,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 #!/bin/bash
 # skills/gh-project-operations/tests/test-coordinator.sh
 
-source "$(dirname "$0")/../lib/coordinator.sh"
+source "$(dirname "$0")/../scripts/coordinator.sh"
 
 PASS=0
 FAIL=0
@@ -3837,7 +3839,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 #!/bin/bash
 # skills/gh-project-charter/tests/test-generator.sh
 
-source "$(dirname "$0")/../lib/charter-create.sh"
+source "$(dirname "$0")/../scripts/charter-create.sh"
 
 PASS=0
 FAIL=0
@@ -3986,7 +3988,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 #!/bin/bash
 # skills/gh-project-charter/tests/test-charter-sections.sh
 
-source "$(dirname "$0")/../lib/charter-sections.sh"
+source "$(dirname "$0")/../scripts/charter-sections.sh"
 
 PASS=0
 FAIL=0
