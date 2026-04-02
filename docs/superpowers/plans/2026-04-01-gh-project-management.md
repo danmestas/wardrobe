@@ -3698,7 +3698,7 @@ test_template_exists() {
 test_template_sections() {
   CONTENT=$(cat skills/gh-project-charter/templates/charter-minimal.md)
   
-  if echo "$CONTENT" | grep -q "## Purpose"; then
+  if echo "$CONTENT" | grep -q "## Goals"; then
     PASS=$((PASS + 1))
   else
     FAIL=$((FAIL + 1))
@@ -3757,11 +3757,11 @@ Expected: FAIL with "No such file"
 
 ---
 
-## Purpose
+## Goals
 
-*Why does this project exist? What problem does it solve?*
+*Why does this project exist? What are we trying to achieve?*
 
-{{PURPOSE_PLACEHOLDER}}
+{{GOALS_PLACEHOLDER}}
 
 ---
 
@@ -3787,38 +3787,21 @@ Expected: FAIL with "No such file"
 
 ---
 
-## Timeline
-
-**Start Date:** {{START_DATE}}
-**Target Completion:** {{TARGET_DATE}}
-
-### Milestones
-
-{{MILESTONES_PLACEHOLDER}}
-
----
-
-## Dependencies
-
-*What does this project depend on? What depends on it?*
-
-{{DEPENDENCIES_PLACEHOLDER}}
-
----
-
-## Risks
-
-*Known risks and mitigation strategies*
-
-{{RISKS_PLACEHOLDER}}
-
----
-
-## Changelog
+## Change Log
 
 ### {{DATE}} - Charter Created
 - Initial project charter created
 - Template: gh-project-charter v1.0
+
+---
+
+**Optional sections (add as needed via `add-section`):**
+- Timeline (milestones, deadlines)
+- Deliverables (specific outputs)
+- Risks & Assumptions
+- Dependencies (blockers, prerequisites)
+- Resources (team, budget)
+- Communication Plan
 ```
 
 Save to: `skills/gh-project-charter/templates/charter-minimal.md`
@@ -3976,7 +3959,7 @@ Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"
 
 Edit: `skills/gh-project-charter/scripts/charter-create.sh`
 
-Add complete implementation that reads template, replaces all placeholders (PROJECT_NAME, PROJECT_NUM, DATE, PURPOSE_PLACEHOLDER, etc.), and writes to output file.
+Add complete implementation that reads template, replaces all placeholders (PROJECT_NAME, PROJECT_NUM, DATE, GOALS_PLACEHOLDER, etc.), and writes to output file.
 
 Full implementation available in design spec section 7.2.
 
@@ -4013,7 +3996,7 @@ setup_test_charter() {
   cat > /tmp/test-charter.md <<'EOF'
 # Project Charter: Test
 
-## Purpose
+## Goals
 Old purpose
 
 ## Scope
@@ -4031,7 +4014,7 @@ EOF
 test_update_section() {
   setup_test_charter
   
-  update_section "/tmp/test-charter.md" "Purpose" "New purpose"
+  update_section "/tmp/test-charter.md" "Goals" "New purpose"
   
   if grep -q "New purpose" /tmp/test-charter.md && ! grep -q "Old purpose" /tmp/test-charter.md; then
     PASS=$((PASS + 1))
@@ -4063,7 +4046,7 @@ test_add_to_section() {
 test_get_section() {
   setup_test_charter
   
-  RESULT=$(get_section "/tmp/test-charter.md" "Purpose")
+  RESULT=$(get_section "/tmp/test-charter.md" "Goals")
   
   if echo "$RESULT" | grep -q "Old purpose"; then
     PASS=$((PASS + 1))
@@ -4202,7 +4185,7 @@ test_create_command() {
 # Test: update command
 test_update_command() {
   RESULT=$(bash skills/gh-project-charter/gh-project-charter.sh update \
-    --section "Purpose" --content "New content" 2>&1)
+    --section "Goals" --content "New content" 2>&1)
   if echo "$RESULT" | grep -q "Updating"; then
     PASS=$((PASS + 1))
   else
@@ -4270,7 +4253,7 @@ Options:
 
 Examples:
   gh-project-charter.sh create --project "My Project" --number 1 --purpose "Build feature"
-  gh-project-charter.sh update --section "Purpose" --content "New purpose"
+  gh-project-charter.sh update --section "Goals" --content "New purpose"
   gh-project-charter.sh add --section "In Scope" --content "- New item"
 EOF
 }
