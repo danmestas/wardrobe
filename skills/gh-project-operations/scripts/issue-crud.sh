@@ -16,6 +16,12 @@ create_issue() {
   local labels="$3"
   local assignee="$4"
 
+  # Input validation
+  if [ -z "$title" ]; then
+    echo "Error: title is required" >&2
+    return 1
+  fi
+
   local cmd="gh issue create --title \"$title\" --body \"$body\""
 
   if [ -n "$labels" ]; then
@@ -38,10 +44,10 @@ list_issues() {
   fi
 
   if [ "${DRY_RUN:-}" = "1" ]; then
-    echo "$cmd"
+    echo "$cmd --json number,title,state,labels"
   else
     cmd="$cmd --json number,title,state,labels"
-    eval "$cmd" | jq '.'
+    eval "$cmd" 2>&1 | jq '.'
   fi
 }
 
@@ -50,6 +56,12 @@ update_issue() {
   local title="$2"
   local body="$3"
   local labels="$4"
+
+  # Input validation
+  if ! [[ "$issue_number" =~ ^[0-9]+$ ]]; then
+    echo "Error: issue_number must be numeric" >&2
+    return 1
+  fi
 
   local cmd="gh issue edit $issue_number"
 
@@ -70,5 +82,12 @@ update_issue() {
 
 delete_issue() {
   local issue_number="$1"
+
+  # Input validation
+  if ! [[ "$issue_number" =~ ^[0-9]+$ ]]; then
+    echo "Error: issue_number must be numeric" >&2
+    return 1
+  fi
+
   _run_cmd "gh issue delete $issue_number --yes"
 }
