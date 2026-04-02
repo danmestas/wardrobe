@@ -4,17 +4,13 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../gh-project-shared/scripts/config-manager.sh" 2>/dev/null || true
 
-# Add issue to project
-# Args: project_num, issue_url
 add_issue_to_project() {
   local project_num="$1"
   local issue_url="$2"
 
-  echo "gh project item-add $project_num --owner @me --url \"$issue_url\""
+  eval "gh project item-add $project_num --owner @me --url \"$issue_url\" --format json" 2>&1
 }
 
-# Update item field value
-# Args: item_id, field_name, value, field_type
 update_item_field() {
   local item_id="$1"
   local field_name="$2"
@@ -42,21 +38,17 @@ update_item_field() {
       ;;
   esac
 
-  echo "$cmd"
+  eval "$cmd" 2>&1
 }
 
-# Archive an item
-# Args: item_id
 archive_item() {
   local item_id="$1"
   local project_id=$(get_project_id)
 
-  echo "gh project item-archive --id \"$item_id\" --owner @me --project-id \"$project_id\""
+  eval "gh project item-archive --id \"$item_id\" --owner @me --project-id \"$project_id\"" 2>&1
 }
 
-# List all items in project
-# Args: project_num
 list_project_items() {
   local project_num="$1"
-  echo "gh project item-list $project_num --owner @me --format json"
+  eval "gh project item-list $project_num --owner @me --format json" | jq '.'
 }
