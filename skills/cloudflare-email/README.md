@@ -42,10 +42,12 @@ Full details in [SKILL.md](./SKILL.md).
 
 The Cloudflare dashboard has an **Activity Log** under Email Service → Email Sending showing recent sends and their status. Mail sent through a different route (e.g. Gmail's `smtp.gmail.com` with a Send-as alias) does **not** appear there, even if the `from` address is on a Cloudflare-verified domain — only direct sends via this API or a Worker do.
 
+Clicking a row opens the session detail, which exposes the RFC 5322 Message-ID (e.g. `<NpkoCxVOvUVmswnF9h9vvVjiZoW9lgivY4xH@yourdomain.com>`) — useful for matching bounces or correlating with the recipient's mail client. The Message-ID is *not* returned in the HTTP 200 response body.
+
 ## Limitations
 
 - **No SMTP endpoint.** Gmail "Send mail as", Apple Mail, Outlook, Thunderbird, and any IMAP/SMTP client cannot use Cloudflare. If you need a human inbox UI with your custom domain, use Zoho Mail (free tier), Google Workspace, Fastmail, or similar.
-- **No IMAP / no sent-mail sync.** The Activity Log is delivery metadata, not message bodies — it won't let you view, resend, or forward the content of a prior send. Persist your own copies if you need that.
+- **No API to retrieve sent content.** There's no list-sends, get-by-id, or body-fetch endpoint — only `POST /send`. The Activity Log is metadata only. If you need an audit trail, log the payload client-side before sending or `bcc` yourself.
 - **Domain must be on Cloudflare DNS.** If your nameservers point elsewhere, Email Service is unavailable.
 - **Bounces go to `cf-bounce.<yourdomain>`.** Don't delete those auto-added DNS records.
 

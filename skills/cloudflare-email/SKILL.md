@@ -131,6 +131,22 @@ Dashboard → your domain → **Email Service** → **Email Sending** → **Acti
 
 Only mail sent through Cloudflare (REST API or Workers binding) shows up. Mail that happens to use a `from` address on a Cloudflare-verified domain but is relayed by another service (e.g. Gmail's `smtp.gmail.com` delivering a "Send mail as" alias) bypasses Cloudflare entirely and will NOT appear in the Activity Log — this is a common point of confusion when debugging whether a send actually went through this service.
 
+**Session detail view** exposes the RFC 5322 **Message-ID** (e.g. `<NpkoCxVOvUVmswnF9h9vvVjiZoW9lgivY4xH@yourdomain.com>`). Useful for:
+- Matching bounces (bounce reports reference the Message-ID)
+- Threading with the recipient's reply in their mail client
+- Correlating with external logs if you shipped the payload to your own logger
+
+The Message-ID is *not* returned in the `POST /email/sending/send` HTTP response — you only see it in the dashboard session view or embedded in the delivered email's headers.
+
+## No API to Retrieve Sent Content
+
+Cloudflare exposes no endpoint to list past sends, fetch a message by ID, or retrieve a previously-sent body. The send endpoint's 200 response body does not include a message_id either. If you need an audit trail of what was actually delivered:
+
+- Log the JSON payload yourself before calling the API (disk, database, logging service)
+- Or save a copy to an inbox you control via `bcc`
+
+Do not rely on Cloudflare to store or resurface outbound content.
+
 ## Limitations
 
 - **No SMTP.** This is the single biggest footgun — users frequently ask to point Gmail Send-as at Cloudflare. It does not work and cannot work. Redirect them to a real mailbox provider if they need SMTP.
