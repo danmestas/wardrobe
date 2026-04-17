@@ -76,6 +76,7 @@ Skills follow the [Agent Skills format](https://github.com/anthropics/agent-skil
 |-------|-------------|
 | [doppler](skills/doppler) | Migrate `.env` files to Doppler secrets management. Detect secrets, create projects, push to Doppler, and set up multi-environment configs. |
 | [apple-contacts](skills/apple-contacts) | Manage Apple Contacts from the terminal via `contactbook` CLI. Full CRUD, group management, search by name/phone/email/org. macOS only. |
+| [cloudflare-email](skills/cloudflare-email) | Send outbound email from a Cloudflare-hosted domain via REST API or Workers binding. No SMTP — complements Email Routing for full send/receive without a mailbox provider. |
 
 ## Installation
 
