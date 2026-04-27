@@ -1,4 +1,4 @@
-import TOML from '@iarna/toml';
+import TOML, { type JsonMap } from '@iarna/toml';
 
 export interface McpServerSpec {
   command: string;
@@ -15,11 +15,11 @@ const BARE_KEY_RE = /^[A-Za-z0-9_-]+$/;
  */
 export function renderMcpServerToml(name: string, spec: McpServerSpec): string {
   const tableKey = BARE_KEY_RE.test(name) ? name : `"${name.replace(/"/g, '\\"')}"`;
-  const body: Record<string, unknown> = { command: spec.command };
+  const body: JsonMap = { command: spec.command };
   if (spec.args && spec.args.length > 0) body.args = spec.args;
   if (spec.env && Object.keys(spec.env).length > 0) body.env = spec.env;
   // Wrap in a top-level mcp_servers.<name> table.
-  const wrapped = { mcp_servers: { [name]: body } };
+  const wrapped: JsonMap = { mcp_servers: { [name]: body } };
   // @iarna/toml emits sorted keys deterministically when fed a plain object;
   // rebuild the section header line ourselves to keep the dotted-key form.
   let raw = TOML.stringify(wrapped);
