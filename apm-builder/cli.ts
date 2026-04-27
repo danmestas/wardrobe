@@ -13,6 +13,10 @@ import { TARGETS, type Target } from './lib/types.ts';
 import { listImplementedTargets } from './adapters/index.ts';
 import { runEvolution } from './lib/evolution/orchestrator.ts';
 import { renderReport } from './lib/evolution/render.ts';
+import { runRelease } from './lib/release/release.ts';
+import { computeTag } from './lib/release/git.ts';
+import { renderReleaseNotes } from './lib/release/notes.ts';
+import { loadRepoConfig } from './lib/config.ts';
 
 const validateCmd = defineCommand({
   meta: { name: 'validate', description: 'Validate all components' },
@@ -231,9 +235,110 @@ const evolveCmd = defineCommand({
   },
 });
 
+const releaseCmd = defineCommand({
+  meta: { name: 'release', description: 'Validate, build, tag, and publish a skill release' },
+  args: {
+    skill: {
+      type: 'string',
+      description: 'Skill name (must match SKILL.md frontmatter)',
+      required: true,
+    },
+    version: {
+      type: 'string',
+      description: 'Semver to release (must match manifest version)',
+      required: true,
+    },
+    summary: {
+      type: 'string',
+      description: 'One-line release summary for CHANGELOG and notes',
+      default: 'See CHANGELOG.md for details.',
+    },
+    'git-repo': { type: 'string', default: 'github.com/danmestas/agent-skills' },
+    'no-push': {
+      type: 'boolean',
+      default: false,
+      description: 'Skip git push of the tag (CI use only)',
+    },
+    'dry-run': {
+      type: 'boolean',
+      default: false,
+      description: 'Print the release plan without tagging or publishing',
+    },
+  },
+  async run({ args }) {
+    const repoRoot = process.cwd();
+    const apmToken = process.env.APM_TOKEN;
+    if (args['dry-run']) {
+      // Dry-run never tags, never publishes, never edits files.
+      // Compose what WOULD happen and print it for human review.
+      const components = await discoverComponents(repoRoot);
+      const target = components.find((c) => c.manifest.name === args.skill);
+      if (!target) {
+        console.log(pc.red(`skill "${args.skill}" not found in skills/, plugins/, or rules/`));
+        process.exit(1);
+      }
+      if (target.manifest.version !== args.version) {
+        console.log(
+          pc.red(
+            `manifest version (${target.manifest.version}) does not match --version (${args.version})`,
+          ),
+        );
+        process.exit(1);
+      }
+      const config = await loadRepoConfig(repoRoot);
+      const apmScope = (config['apm']?.['package_scope'] as string | undefined) ?? '';
+      const apmRegistry = (config['apm']?.['registry'] as string | undefined) ?? '';
+      const tag = computeTag(args.skill, args.version);
+      const notes = renderReleaseNotes({
+        component: target,
+        summary: args.summary,
+        apmScope,
+        gitRepo: args['git-repo'],
+      });
+      console.log(pc.cyan('=== release plan (dry-run) ==='));
+      console.log(`  tag:        ${tag}`);
+      console.log(`  targets:    ${target.manifest.targets.join(', ')}`);
+      console.log(`  apm scope:  ${apmScope || '(none)'}`);
+      console.log(
+        `  apm mode:   ${apmRegistry ? `registry (${apmRegistry})` : 'git-url (no registry)'}`,
+      );
+      console.log(`  git push:   ${args['no-push'] ? 'skipped' : 'origin'}`);
+      console.log(pc.cyan('--- release notes ---'));
+      console.log(notes);
+      console.log(pc.cyan('--- end ---'));
+      console.log(pc.yellow('dry-run: no tag created, no artifacts published, no files written'));
+      return;
+    }
+    try {
+      const result = await runRelease({
+        repoRoot,
+        skill: args.skill,
+        version: args.version,
+        summary: args.summary,
+        apmToken,
+        gitRepo: args['git-repo'],
+        pushTag: !args['no-push'],
+      });
+      console.log(pc.green(`released ${result.tag}`));
+      console.log(
+        pc.cyan(`  claude-code: ${result.published.claudeCode ? 'published' : 'skipped'}`),
+      );
+      console.log(pc.cyan(`  apm:         ${result.published.apm}`));
+      console.log(
+        pc.cyan(
+          `  git-url:     ${result.published.gitUrlTargets.length > 0 ? result.published.gitUrlTargets.join(', ') : 'none'}`,
+        ),
+      );
+    } catch (err) {
+      console.log(pc.red(`release failed: ${(err as Error).message}`));
+      process.exit(1);
+    }
+  },
+});
+
 const main = defineCommand({
   meta: { name: 'apm-builder', description: 'Multi-harness skills build tool' },
-  subCommands: { validate: validateCmd, build: buildCmd, watch: watchCmd, docs: docsCmd, init: initCmd, evolve: evolveCmd },
+  subCommands: { validate: validateCmd, build: buildCmd, watch: watchCmd, docs: docsCmd, init: initCmd, evolve: evolveCmd, release: releaseCmd },
 });
 
 runMain(main);
