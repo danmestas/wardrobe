@@ -4,16 +4,20 @@ import pc from 'picocolors';
 import chokidar from 'chokidar';
 import { discoverComponents } from './lib/discover.ts';
 import { validateComponents } from './lib/validate.ts';
-import { runBuild } from './lib/build.ts';
+import { runBuild, matchesGlob } from './lib/build.ts';
 import { renderReadme } from './lib/docs.ts';
 import { TARGETS, type Target } from './lib/types.ts';
 import { listImplementedTargets } from './adapters/index.ts';
 
 const validateCmd = defineCommand({
   meta: { name: 'validate', description: 'Validate all components' },
-  async run() {
+  args: {
+    filter: { type: 'string', description: 'Glob filter on component names', required: false },
+  },
+  async run({ args }) {
     const repoRoot = process.cwd();
-    const components = await discoverComponents(repoRoot);
+    const all = await discoverComponents(repoRoot);
+    const components = args.filter ? all.filter((c) => matchesGlob(c.manifest.name, args.filter!)) : all;
     const errors = validateComponents(components);
     for (const e of errors) {
       const prefix = e.severity === 'error' ? pc.red('error') : pc.yellow('warn');
