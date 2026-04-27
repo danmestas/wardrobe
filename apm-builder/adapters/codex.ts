@@ -11,6 +11,7 @@ import {
   DEFAULT_SECTION_ORDER,
   type AgentsMdSection,
 } from '../lib/agents-md.ts';
+import { renderMcpServerToml } from '../lib/toml.ts';
 
 const TARGET = 'codex' as const;
 
@@ -29,7 +30,8 @@ export const codexAdapter: Adapter = {
         return emitAgentsMd(component, ctx);
       case 'hook':
         return emitHook(component);
-      // mcp added in Task 9.
+      case 'mcp':
+        return emitMcp(component, ctx);
       // plugin is schema-rejected for codex (see Plan 1's validate.ts).
       default:
         throw new Error(
@@ -107,6 +109,32 @@ function emitAgentsMd(
     sectionOrder,
   });
   return [{ path: 'AGENTS.md', content }];
+}
+
+function emitMcp(
+  component: ComponentSource,
+  ctx: AdapterContext,
+): EmittedFile[] {
+  // Idempotency: only the alphabetically-first mcp component emits the file.
+  const allMcp = ctx.allComponents
+    .filter(
+      (c) => c.manifest.type === 'mcp' && c.manifest.targets.includes(TARGET),
+    )
+    .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
+  if (allMcp[0]?.manifest.name !== component.manifest.name) return [];
+
+  const blocks = allMcp
+    .filter((c) => c.manifest.mcp !== undefined)
+    .map((c) =>
+      renderMcpServerToml(c.manifest.name, {
+        command: c.manifest.mcp!.command,
+        args: c.manifest.mcp!.args,
+        env: c.manifest.mcp!.env,
+      }).trimEnd(),
+    );
+
+  const content = blocks.join('\n\n') + '\n';
+  return [{ path: 'codex.config.toml', content }];
 }
 
 function readSectionOrder(config: Record<string, unknown>): AgentsMdSection[] {

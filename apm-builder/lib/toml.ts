@@ -31,6 +31,8 @@ export function renderMcpServerToml(name: string, spec: McpServerSpec): string {
   );
   // @iarna/toml emits arrays with spaces (`[ "a", "b" ]`); normalize to compact form.
   raw = raw.replace(/^(\s*\w+\s*=\s*)\[ (.+) \]$/gm, '$1[$2]');
+  // @iarna/toml indents nested sub-tables with leading whitespace; strip it.
+  raw = raw.replace(/^[ \t]+/gm, '');
   return raw;
 }
 

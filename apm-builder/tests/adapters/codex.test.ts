@@ -91,4 +91,20 @@ describe('codex adapter', () => {
     const result = await runGolden(codexAdapter, path.join(HERE, 'codex/hook-basic'));
     expect(result.diff).toEqual([]);
   });
+
+  it('composes multiple mcp components into one codex.config.toml', async () => {
+    const root = path.join(HERE, 'codex/mcp-basic');
+    const a = await loadComponent(path.join(root, 'component'), root);
+    const b = await loadComponent(path.join(root, 'extra/mcp/another-server'), root);
+    const all = [a, b];
+    const results = await Promise.all(
+      all.map((c) =>
+        codexAdapter.emit(c, { config: {}, allComponents: all, repoRoot: root }),
+      ),
+    );
+    const tomlFiles = results.flat().filter((f) => f.path === 'codex.config.toml');
+    expect(tomlFiles).toHaveLength(1); // idempotency
+    const expected = await fs.readFile(path.join(root, 'expected/codex.config.toml'), 'utf8');
+    expect(tomlFiles[0]?.content.toString().trim()).toBe(expected.trim());
+  });
 });
