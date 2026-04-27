@@ -1,135 +1,125 @@
-# Agent Skills
+# agent-skills
 
-A collection of skills for AI coding agents. Skills are packaged instructions and optional scripts that extend agent capabilities beyond their default behavior.
+Multi-harness skills monorepo for AI coding agents. Authors write skills, agents, rules, hooks, MCP configs, and plugins once in canonical `SKILL.md` format; `apm-builder` emits per-harness artifacts for **Claude Code**, **APM**, **Codex**, **Gemini CLI**, **Copilot CLI**, and **Pi**.
 
-Skills follow the [Agent Skills format](https://github.com/anthropics/agent-skills).
+> **Status (2026-04-27):** Foundation + Claude Code adapter merged. APM, Codex, Gemini, Copilot CLI, and Pi adapters are in flight (PRs forthcoming). Skill migrations to canonical frontmatter follow in a subsequent plan; today most skills predate the schema and aren't yet emitted by `apm-builder`.
 
-## Available Skills
+## Install
 
-### Design & Architecture
+### Claude Code (marketplace)
 
-| Skill | Description |
-|-------|-------------|
-| [hipp](skills/hipp) | Dr. D. Richard Hipp's software design philosophy (SQLite, Fossil SCM). Small, fast, reliable, self-contained, zero-config, built to last decades. |
-| [ousterhout](skills/ousterhout) | John Ousterhout's *A Philosophy of Software Design*. Deep modules, information hiding, strategic programming, minimizing cognitive load. |
-| [tigerstyle](skills/tigerstyle) | TigerBeetle's coding style for safety-critical systems. Safety > Performance > DX, zero technical debt, NASA Power of Ten rules, assertion-heavy development. |
+```text
+/plugin marketplace add danmestas/agent-skills
+/plugin install <plugin-name>@danmestas/agent-skills
+```
 
-### Language-Specific
+Once Plan 7 (skill migrations) lands, individual skills will also be installable via the marketplace. Until then, prefer the per-skill manual install: clone the repo and copy the desired `skills/<name>/` directory into your `~/.claude/skills/`.
 
-| Skill | Description |
-|-------|-------------|
-| [idiomatic-go](skills/idiomatic-go) | Jon Bodner's *Learning Go* idiomatic patterns. Anti-patterns table for error handling, slices, interfaces, concurrency, and design. Clarity over cleverness. |
+### APM
 
-### UI & Interaction Design
+```yaml
+# apm.yml
+dependencies:
+  apm:
+    - danmestas/agent-skills
+```
 
-| Skill | Description |
-|-------|-------------|
-| [norman](skills/norman) | Don Norman's principles of interaction design. Affordances, signifiers, mapping, feedback, conceptual models, constraints, and error prevention. |
-| [dx-audit](skills/dx-audit) | Systematic DX/UX scoring by enumerating real workflows, identifying friction, and calculating weighted scores with ranked improvements. |
+> APM adapter is in development; manifests are not yet emitted. Track progress in the open PR series under [Plan 2](https://github.com/danmestas/agent-skills/pulls).
 
-### Project Management
+### Codex / Gemini CLI / Copilot CLI / Pi
 
-| Skill | Description |
-|-------|-------------|
-| [linear-method](skills/linear-method) | The Linear Method for issue management. Plain-language issues, 4-priority system, hierarchy, cycles, and backlog hygiene. |
-| [atlassian-cli-jira](skills/atlassian-cli-jira) | Manage Jira Cloud via Atlassian CLI (acli). Search, create, edit, transition, comment, link, bulk operations, and sprint discovery. |
-| [gh-project-setup](skills/gh-project-setup) | Create and configure GitHub Projects V2 with context-aware template selection (kanban, bug-tracker, feature-dev, roadmap, research, release-planning). |
-| [gh-project-operations](skills/gh-project-operations) | Daily GitHub Projects V2 operations. CRUD on issues, status changes, bulk operations, CSV import/export, and charter coordination. |
-| [gh-project-charter](skills/gh-project-charter) | Project charter management for GitHub Projects V2. Goals, scope, success criteria, and change logging with progressive enhancement. |
-| [gh-project-shared](skills/gh-project-shared) | Shared utilities for the gh-project-* skills. CLI validation, auth checking, config management, and error handling. Not directly invoked. |
+Adapters for these harnesses are pending. Each will land as its own PR (Plans 3–6). When ready, the canonical `targets:` field on a skill's frontmatter will gate emission for that harness.
 
-### Testing
+## Categories
 
-| Skill | Description |
-|-------|-------------|
-| [deterministic-simulation-testing](skills/deterministic-simulation-testing) | Collapse distributed systems into single-threaded simulations with controlled non-determinism. BUGGIFY fault injection, VOPR patterns, invariant checking. |
-| [midscene-testing](skills/midscene-testing) | Screenshot-driven browser smoke testing via Midscene's headless Puppeteer mode. Ad-hoc UI validation, Datastar/HTMX/SSE testing, report consolidation. |
+### Software design philosophy
 
-### Web Frameworks
+- [`ousterhout`](skills/ousterhout) — *A Philosophy of Software Design*: deep modules, information hiding, strategic programming, minimizing cognitive load.
+- [`hipp`](skills/hipp) — D. Richard Hipp's principles (SQLite, Fossil): zero-config, embedded, simplicity, built to last decades.
+- [`norman`](skills/norman) — Don Norman's interaction-design principles: affordances, signifiers, mapping, feedback, error prevention.
+- [`tigerstyle`](skills/tigerstyle) — TigerBeetle's NASA Power-of-Ten safety-critical discipline: assertion-heavy development, zero technical debt.
 
-| Skill | Description |
-|-------|-------------|
-| [datastar-tao](skills/datastar-tao) | The Tao of Datastar — philosophy for hypermedia-driven web apps. Backend owns state, SSE, HTML-over-the-wire, DOM morphing. |
-| [datastar-patterns](skills/datastar-patterns) | Datastar UI implementation patterns — search, inline editing, infinite scroll, file upload, validation, bulk operations, polling. |
+### Development tooling
 
-### Observability
+- [`mgrep-code-search`](skills/mgrep-code-search) — Semantic code search for large codebases. Natural-language queries across code, text, PDFs, and images.
+- [`dx-audit`](skills/dx-audit) — Workflow-based DX/UX scoring with weighted friction analysis and ranked improvements.
+- [`idiomatic-go`](skills/idiomatic-go) — Go style and idioms (Bodner's *Learning Go*): error handling, slices, interfaces, concurrency.
+- [`apm-builder`](skills/apm-builder) — This repo's build tool itself. Validate, build, watch, scaffold, regenerate docs.
+- [`cloudflare-email`](skills/cloudflare-email) — Send outbound email from Cloudflare-hosted domains via REST API or Workers binding.
 
-| Skill | Description |
-|-------|-------------|
-| [signoz-dashboard-builder](skills/signoz-dashboard-builder) | Create and update SigNoz dashboards via MCP API. Panels for metrics, logs, traces, and Claude Code telemetry. |
+### Project & process
 
-### Knowledge Management
+- [`linear-method`](skills/linear-method) — The Linear Method: plain-language issues, 4-priority system, cycles, backlog hygiene.
+- [`gh-project-charter`](skills/gh-project-charter) — GitHub Projects V2 charter management: goals, scope, success criteria, change log.
+- [`gh-project-setup`](skills/gh-project-setup) — Create and configure GitHub Projects V2 with template selection (kanban, bug-tracker, feature-dev, roadmap, etc.).
+- [`gh-project-operations`](skills/gh-project-operations) — Daily GitHub Projects V2 operations: issue CRUD, status changes, bulk ops, CSV import/export.
+- [`gh-project-shared`](skills/gh-project-shared) — Shared utilities for the `gh-project-*` skills (CLI validation, auth checks, config). Not directly invoked.
+- [`knowledge-base`](skills/knowledge-base) — Long-running LLM-maintained knowledge bases as Obsidian-compatible wikis.
 
-| Skill | Description |
-|-------|-------------|
-| [knowledge-base](skills/knowledge-base) | LLM-maintained knowledge bases as Obsidian-compatible wikis. Ingest sources, query accumulated research, lint for consistency. |
+### Integrations & data
 
-### Code Search
+- [`signoz-dashboard-builder`](skills/signoz-dashboard-builder) — Build SigNoz dashboards via MCP API (metrics, logs, traces, telemetry panels).
+- [`datastar-tao`](skills/datastar-tao) — *The Tao of Datastar*: hypermedia philosophy, backend-owned state, SSE, DOM morphing.
+- [`datastar-patterns`](skills/datastar-patterns) — Datastar UI implementation patterns: search, inline editing, infinite scroll, file upload, validation, polling.
+- [`apple-contacts`](skills/apple-contacts) — Apple Contacts CRUD via the `contactbook` CLI (macOS only).
+- [`atlassian-cli-jira`](skills/atlassian-cli-jira) — Manage Jira Cloud via Atlassian CLI (`acli`): search, create, edit, transition, bulk ops, sprints.
+- [`deterministic-simulation-testing`](skills/deterministic-simulation-testing) — Collapse distributed systems into single-threaded simulations: BUGGIFY fault injection, VOPR patterns.
+- [`doppler`](skills/doppler) — Migrate `.env` files to Doppler secrets management; multi-environment configs.
+- [`midscene-testing`](skills/midscene-testing) — Screenshot-driven browser smoke testing via Midscene's headless Puppeteer mode.
 
-| Skill | Description |
-|-------|-------------|
-| [mgrep-code-search](skills/mgrep-code-search) | Semantic code search using mgrep. Natural language queries across code, text, PDFs, and images. Complements grep/ripgrep for finding features, understanding intent, and exploring unfamiliar codebases. |
+## Components
 
-### Agent Tooling
+The table below is regenerated from canonical `SKILL.md` frontmatter via `npm run docs`. Until Plan 7 migrates the existing skills to the canonical schema, this table reflects only the components that already conform.
 
-| Skill | Description |
-|-------|-------------|
-| [apm-builder](skills/apm-builder) | Build and distribute APM (Agent Package Manager) bundles. Scaffold packages, author primitives (skills, agents, instructions, hooks), target Claude Code/Copilot/Cursor, and export plugins. Full CLI reference included. |
+<!-- AUTO-GENERATED: COMPONENTS -->
+| Name | Type | Version | Description | Targets |
+|------|------|---------|-------------|---------|
+<!-- /AUTO-GENERATED: COMPONENTS -->
 
-### DevOps & Utilities
-
-| Skill | Description |
-|-------|-------------|
-| [doppler](skills/doppler) | Migrate `.env` files to Doppler secrets management. Detect secrets, create projects, push to Doppler, and set up multi-environment configs. |
-| [apple-contacts](skills/apple-contacts) | Manage Apple Contacts from the terminal via `contactbook` CLI. Full CRUD, group management, search by name/phone/email/org. macOS only. |
-| [cloudflare-email](skills/cloudflare-email) | Send outbound email from a Cloudflare-hosted domain via REST API or Workers binding. No SMTP — complements Email Routing for full send/receive without a mailbox provider. |
-
-## Installation
-
-Install all skills from this repo:
+## Building
 
 ```bash
-npx skills add danmestas/agent-skills
+npm install
+npm run validate -- --filter <name>     # validate one component
+npm run build -- --target claude-code   # build Claude Code artifacts
+npm run watch -- --target claude-code   # rebuild on change
+npm run docs                             # regenerate the components table above
+npm run init -- my-skill --type skill    # scaffold a new component
+npm test                                 # run apm-builder unit tests
 ```
 
-Install a single skill:
+`npm run docs` only rewrites the region between `<!-- AUTO-GENERATED: COMPONENTS -->` and `<!-- /AUTO-GENERATED: COMPONENTS -->`. Everything outside the markers — including the categorized list above — is hand-written and preserved across regenerations.
 
-```bash
-npx skills add danmestas/agent-skills --skill <skill-name>
+## Architecture
+
+For the full build-tool reference, read [`skills/apm-builder/SKILL.md`](skills/apm-builder/SKILL.md).
+
+The canonical source format is one `SKILL.md` per component with YAML frontmatter:
+
+```yaml
+---
+name: my-skill
+version: 1.0.0
+description: Use when [describe triggering conditions in one sentence]
+type: skill
+targets: [claude-code, apm, codex, gemini, copilot, pi]
+---
+
+(skill body)
 ```
 
-Example:
+Per-harness emission honors a compatibility matrix (see [`apm-builder/lib/validate.ts`](apm-builder/lib/validate.ts) and the matrix described in [`skills/apm-builder/SKILL.md`](skills/apm-builder/SKILL.md#component-types)) — not every component type works on every harness. The validator rejects incompatible combinations and warns on best-effort ones.
 
-```bash
-npx skills add danmestas/agent-skills --skill tigerstyle
-```
+Component types: `skill`, `plugin`, `hook`, `agent`, `rules`, `mcp`. See [`apm-builder/lib/types.ts`](apm-builder/lib/types.ts) for the full manifest shape.
 
-## Usage
+## Contributing
 
-Skills are automatically available once installed. The agent uses them when relevant tasks are detected.
-
-Examples:
-
-```
-Write a Go HTTP handler with proper error handling     # triggers idiomatic-go
-Review this module for unnecessary complexity          # triggers ousterhout
-Audit the DX of this CLI tool                          # triggers dx-audit
-Set up a GitHub project board for this repo            # triggers gh-project-setup
-Create a Jira issue for ABC-123                        # triggers atlassian-cli-jira
-Migrate my .env files to Doppler                       # triggers doppler
-Build a Datastar search component                      # triggers datastar-patterns
-Ingest this article into my research wiki              # triggers knowledge-base
-Where is authentication handled in this codebase?      # triggers mgrep-code-search
-```
-
-## Skill Structure
-
-Each skill contains:
-
-- `SKILL.md` - Instructions for the agent (required)
-- `scripts/` - Helper scripts for automation (optional)
-- `references/` - Supporting documentation (optional)
+- Branch from `main` and open a PR — direct pushes to `main` are not accepted.
+- Run `npm test` and `npx tsc --noEmit` before pushing; both must be green.
+- Keep commit messages focused and imperative (e.g., `feat(apm-builder): ...`, `docs: ...`).
+- Do not include AI-tool attribution in commit messages or PR bodies.
+- New skills follow the `kebab-case` directory convention under `skills/`. Plugins live under `plugins/`. See [`AGENTS.md`](AGENTS.md) for repo-level guidelines.
 
 ## License
 
-MIT
+[MIT](LICENSE).
