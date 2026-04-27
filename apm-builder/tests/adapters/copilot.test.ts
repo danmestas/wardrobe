@@ -91,4 +91,21 @@ describe('copilot adapter', () => {
     );
     expect(file!.content.toString()).toBe(expected);
   });
+
+  it('honors hooks_dir override from repo config and preserves matcher', async () => {
+    const root = path.join(HERE, 'copilot/hook-custom-dir');
+    const hook = await loadComponent(path.join(root, 'component'), root);
+    const emitted = await copilotAdapter.emit(hook, {
+      config: { hooks_dir: '.copilot/hooks' },
+      allComponents: [hook],
+      repoRoot: root,
+    });
+    const file = emitted.find((f) => f.path === '.copilot/hooks/PreToolUse-guard.json');
+    expect(file).toBeDefined();
+    const expected = await fs.readFile(
+      path.join(root, 'expected/.copilot/hooks/PreToolUse-guard.json'),
+      'utf8',
+    );
+    expect(file!.content.toString()).toBe(expected);
+  });
 });
