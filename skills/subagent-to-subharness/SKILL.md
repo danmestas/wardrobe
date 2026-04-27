@@ -1,6 +1,15 @@
 ---
 name: subagent-to-subharness
-description: Use when you would normally dispatch a subagent via the Agent tool but you're operating as the Darkish Factory orchestrator. Translates the muscle memory into subharness dispatch. Maps task shapes to the right harness role, frames the task in caveman-standard, reads worker output back, decides next step.
+version: 0.1.0
+description: >-
+  Use when you would normally dispatch a subagent via the Agent tool but
+  you're operating as the Darkish Factory orchestrator. Translates the
+  muscle memory into subharness dispatch. Maps task shapes to the right
+  harness role, frames the task in caveman-standard, reads worker output
+  back, decides next step.
+type: skill
+targets:
+  - claude-code
 category:
   primary: workflow
 ---

@@ -1,6 +1,15 @@
 ---
 name: orchestrator-mode
-description: Use at session start in the Darkish Factory repo to prime as the pipeline orchestrator (host mode). Loads the §7 loop, the 13-role roster, the escalation classifier, and the rules for converting subagent muscle memory into subharness dispatch. Invoke whenever the operator types a task and you're in this repo.
+version: 0.1.0
+description: >-
+  Use at session start in the Darkish Factory repo to prime as the pipeline
+  orchestrator (host mode). Loads the §7 loop, the 13-role roster, the
+  escalation classifier, and the rules for converting subagent muscle memory
+  into subharness dispatch. Invoke whenever the operator types a task and
+  you're in this repo.
+type: skill
+targets:
+  - claude-code
 category:
   primary: workflow
 ---
