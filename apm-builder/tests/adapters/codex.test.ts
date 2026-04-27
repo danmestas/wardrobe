@@ -27,4 +27,9 @@ describe('codex adapter', () => {
     expect(result.diff).toEqual([]);
     expect(result.matched).toBe(true);
   });
+
+  it('emits a single agent into AGENTS.md', async () => {
+    const result = await runGolden(codexAdapter, path.join(HERE, 'codex/agent-basic'));
+    expect(result.diff).toEqual([]);
+  });
 });
