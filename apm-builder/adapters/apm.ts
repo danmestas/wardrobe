@@ -74,11 +74,37 @@ export const apmAdapter: Adapter = {
         return emitAgent(component, ctx);
       case 'hook':
         return emitHook(component, ctx);
+      case 'mcp':
+        return emitMcp(component, ctx);
       default:
         throw new Error(`apm adapter: type "${component.manifest.type}" not yet implemented`);
     }
   },
 };
+
+function emitMcp(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  const mcp = component.manifest.mcp;
+  if (!mcp) return [];
+  const dir = packageDir(component);
+  const mcpEntry: Record<string, unknown> = {
+    name: component.manifest.name,
+    registry: false,
+    transport: 'stdio',
+    command: mcp.command,
+  };
+  if (mcp.args && mcp.args.length > 0) mcpEntry.args = mcp.args;
+  if (mcp.env && Object.keys(mcp.env).length > 0) mcpEntry.env = mcp.env;
+
+  const manifest: Record<string, unknown> = {
+    name: scopedName(component, ctx),
+    version: component.manifest.version,
+    description: component.manifest.description,
+    type: 'skill',
+    includes: 'auto',
+    dependencies: { mcp: [mcpEntry] },
+  };
+  return [{ path: `${dir}/apm.yml`, content: renderManifest(manifest) }];
+}
 
 async function emitHook(component: ComponentSource, ctx: AdapterContext): Promise<EmittedFile[]> {
   if (!component.manifest.hooks) return [];

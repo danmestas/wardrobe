@@ -51,4 +51,13 @@ describe('apm adapter', () => {
     );
     expect(result.diff).toEqual([]);
   });
+
+  it('emits an mcp component as a self-defined dependency in apm.yml', async () => {
+    const result = await runGolden(
+      apmAdapter,
+      path.join(HERE, 'apm/mcp-basic'),
+      SCOPED_CONFIG,
+    );
+    expect(result.diff).toEqual([]);
+  });
 });
