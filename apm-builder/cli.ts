@@ -1,9 +1,11 @@
+import fs from 'node:fs/promises';
 import { defineCommand, runMain } from 'citty';
 import pc from 'picocolors';
 import chokidar from 'chokidar';
 import { discoverComponents } from './lib/discover.ts';
 import { validateComponents } from './lib/validate.ts';
 import { runBuild } from './lib/build.ts';
+import { renderReadme } from './lib/docs.ts';
 import { TARGETS, type Target } from './lib/types.ts';
 import { listImplementedTargets } from './adapters/index.ts';
 
@@ -101,9 +103,20 @@ const watchCmd = defineCommand({
   },
 });
 
+const docsCmd = defineCommand({
+  meta: { name: 'docs', description: 'Regenerate top-level README.md' },
+  async run() {
+    const repoRoot = process.cwd();
+    const components = await discoverComponents(repoRoot);
+    const md = renderReadme(components);
+    await fs.writeFile(`${repoRoot}/README.md`, md);
+    console.log(pc.green(`wrote README.md (${components.length} components).`));
+  },
+});
+
 const main = defineCommand({
   meta: { name: 'apm-builder', description: 'Multi-harness skills build tool' },
-  subCommands: { validate: validateCmd, build: buildCmd, watch: watchCmd },
+  subCommands: { validate: validateCmd, build: buildCmd, watch: watchCmd, docs: docsCmd },
 });
 
 runMain(main);
