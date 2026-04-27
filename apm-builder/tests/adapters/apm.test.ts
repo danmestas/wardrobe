@@ -42,4 +42,13 @@ describe('apm adapter', () => {
     );
     expect(result.diff).toEqual([]);
   });
+
+  it('emits a hook with bundled scripts and a scripts: entry per event', async () => {
+    const result = await runGolden(
+      apmAdapter,
+      path.join(HERE, 'apm/hook-basic'),
+      SCOPED_CONFIG,
+    );
+    expect(result.diff).toEqual([]);
+  });
 });

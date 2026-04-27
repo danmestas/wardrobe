@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import YAML from 'yaml';
 import type {
   Adapter,
@@ -70,11 +72,46 @@ export const apmAdapter: Adapter = {
         return emitSkill(component, ctx);
       case 'agent':
         return emitAgent(component, ctx);
+      case 'hook':
+        return emitHook(component, ctx);
       default:
         throw new Error(`apm adapter: type "${component.manifest.type}" not yet implemented`);
     }
   },
 };
+
+async function emitHook(component: ComponentSource, ctx: AdapterContext): Promise<EmittedFile[]> {
+  if (!component.manifest.hooks) return [];
+  const dir = packageDir(component);
+  const files: EmittedFile[] = [];
+  const scripts: Record<string, string> = {};
+
+  for (const [event, def] of Object.entries(component.manifest.hooks)) {
+    const scriptName = path.basename(def.command);
+    scripts[`hook:${event}:${scriptName}`] = `\${APM_PACKAGE_DIR}/.apm/hooks/${scriptName}`;
+    const scriptPath = path.join(component.dir, def.command);
+    const exists = await fs.stat(scriptPath).then(() => true).catch(() => false);
+    if (exists) {
+      const content = await fs.readFile(scriptPath);
+      files.push({
+        path: `${dir}/.apm/hooks/${scriptName}`,
+        content,
+        mode: 0o755,
+      });
+    }
+  }
+
+  const manifest: Record<string, unknown> = {
+    name: scopedName(component, ctx),
+    version: component.manifest.version,
+    description: component.manifest.description,
+    type: 'skill',
+    includes: 'auto',
+    scripts,
+  };
+  files.push({ path: `${dir}/apm.yml`, content: renderManifest(manifest) });
+  return files;
+}
 
 function emitAgent(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
   const dir = packageDir(component);
