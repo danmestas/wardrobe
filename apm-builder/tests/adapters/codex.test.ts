@@ -32,4 +32,9 @@ describe('codex adapter', () => {
     const result = await runGolden(codexAdapter, path.join(HERE, 'codex/agent-basic'));
     expect(result.diff).toEqual([]);
   });
+
+  it('emits a single rule into AGENTS.md', async () => {
+    const result = await runGolden(codexAdapter, path.join(HERE, 'codex/rules-basic'));
+    expect(result.diff).toEqual([]);
+  });
 });
