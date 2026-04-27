@@ -17,6 +17,13 @@ const MATRIX: Record<ComponentType, Record<Target, Cell>> = {
   mcp:    { 'claude-code': 'ok',    apm: 'ok', codex: 'ok',    gemini: 'ok',    copilot: 'error', pi: 'warn' },
 };
 
+function validTypesForTarget(target: Target): ComponentType[] {
+  return (Object.keys(MATRIX) as ComponentType[]).filter((tt) => MATRIX[tt][target] !== 'error');
+}
+function validTargetsForType(type: ComponentType): Target[] {
+  return (Object.keys(MATRIX[type]) as Target[]).filter((t) => MATRIX[type][t] !== 'error');
+}
+
 export function validateComponents(components: ComponentSource[]): ValidationError[] {
   const errors: ValidationError[] = [];
   const byName = new Map<string, ComponentSource>();
@@ -37,10 +44,12 @@ export function validateComponents(components: ComponentSource[]): ValidationErr
     for (const t of c.manifest.targets) {
       const cell = MATRIX[c.manifest.type][t];
       if (cell === 'error') {
+        const altTypes = validTypesForTarget(t).join(', ');
+        const altTargets = validTargetsForType(c.manifest.type).join(', ');
         errors.push({
           severity: 'error',
           componentName: c.manifest.name,
-          message: `type "${c.manifest.type}" cannot target "${t}" (schema-rejected per compatibility matrix)`,
+          message: `type "${c.manifest.type}" cannot target "${t}". Either remove "${t}" from targets (valid for this type: ${altTargets}), or change type to one of: ${altTypes}.`,
         });
       } else if (cell === 'warn') {
         errors.push({

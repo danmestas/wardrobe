@@ -32,6 +32,21 @@ describe('validateComponents', () => {
     expect(errors[0]?.message).toMatch(/plugin.*codex/i);
   });
 
+  it('compatibility-matrix error includes remediation hints (alternative types and targets)', () => {
+    const errors = validateComponents([
+      mk({ name: 'p', type: 'plugin', targets: ['codex'], includes: [] }),
+    ]);
+    const matrixErr = errors.find((e) => /cannot target/i.test(e.message));
+    expect(matrixErr).toBeDefined();
+    // Names valid types for the target ("codex"): everything except plugin.
+    expect(matrixErr!.message).toMatch(/skill/);
+    expect(matrixErr!.message).toMatch(/hook/);
+    // Names valid targets for the type ("plugin"): claude-code, apm, pi.
+    expect(matrixErr!.message).toMatch(/claude-code/);
+    expect(matrixErr!.message).toMatch(/apm/);
+    expect(matrixErr!.message).toMatch(/pi/);
+  });
+
   it('warns on hook for Pi (best-effort, not error)', () => {
     const errors = validateComponents([
       mk({ name: 'h', type: 'hook', targets: ['pi'], hooks: { Stop: { command: 's' } } }),
