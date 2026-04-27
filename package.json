@@ -10,6 +10,7 @@
     "docs": "tsx apm-builder/cli.ts docs",
     "evolve": "tsx apm-builder/cli.ts evolve",
     "init": "tsx apm-builder/cli.ts init",
+    "release": "tsx apm-builder/cli.ts release",
     "test": "vitest run",
     "smoke": "vitest run apm-builder/tests/smoke.test.ts",
     "test:watch": "vitest",
