@@ -38,4 +38,22 @@ describe('copilot adapter', () => {
     // Idempotency: the composed file should be emitted exactly once across all rules.
     expect(flat.filter((f) => f.path === 'copilot-instructions.md').length).toBe(1);
   });
+
+  it('appends skills as ## sections under # Skills, alphabetical', async () => {
+    const root = path.join(HERE, 'copilot/skill-as-instructions');
+    const alpha = await loadComponent(path.join(root, 'component'), root);
+    const beta = await loadComponent(path.join(root, 'extra/skills/another'), root);
+    const all = [alpha, beta];
+    const results = await Promise.all(
+      all.map((c) =>
+        copilotAdapter.emit(c, { config: {}, allComponents: all, repoRoot: root }),
+      ),
+    );
+    const flat = results.flat();
+    const file = flat.find((f) => f.path === 'copilot-instructions.md');
+    const expected = await fs.readFile(path.join(root, 'expected/copilot-instructions.md'), 'utf8');
+    expect(file?.content.toString()).toBe(expected);
+    // Idempotency: emitted exactly once.
+    expect(flat.filter((f) => f.path === 'copilot-instructions.md').length).toBe(1);
+  });
 });

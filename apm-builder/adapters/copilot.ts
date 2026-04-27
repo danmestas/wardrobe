@@ -1,5 +1,5 @@
 import type { Adapter, ComponentSource, EmittedFile, AdapterContext } from '../lib/types.ts';
-import { isFirstRule, renderRulesSections, selectAndSortRules } from '../lib/rules.ts';
+import { renderRulesSections, selectAndSortRules } from '../lib/rules.ts';
 
 export const copilotAdapter: Adapter = {
   target: 'copilot',
@@ -11,8 +11,9 @@ export const copilotAdapter: Adapter = {
   async emit(component, ctx) {
     switch (component.manifest.type) {
       case 'rules':
-        return emitRules(component, ctx);
-      // skill, hook implementations land in Tasks 4 and 6.
+      case 'skill':
+        return emitInstructions(component, ctx);
+      // hook implementation lands in Task 6.
       default:
         throw new Error(
           `copilot adapter: type "${component.manifest.type}" not yet implemented`,
@@ -21,14 +22,35 @@ export const copilotAdapter: Adapter = {
   },
 };
 
-function emitRules(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
-  const scope = component.manifest.scope ?? 'project';
-  if (scope !== 'project') {
-    // Copilot CLI does not have a user-scoped rules concept; user-scoped rules are skipped silently.
+function emitInstructions(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  // Collect all components contributing to copilot-instructions.md.
+  const rules = selectAndSortRules(ctx.allComponents, 'copilot', 'project');
+  const skills = ctx.allComponents
+    .filter(
+      (c) =>
+        c.manifest.type === 'skill' &&
+        c.manifest.targets.includes('copilot'),
+    )
+    .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
+
+  // Pick a canonical owner: alphabetically-first project rule, or, if no rules, alphabetically-first skill.
+  const owner = rules[0] ?? skills[0];
+  if (!owner || owner.manifest.name !== component.manifest.name) return [];
+
+  // For rule components that are user-scoped, opt out (Copilot has no user scope).
+  if (component.manifest.type === 'rules' && (component.manifest.scope ?? 'project') !== 'project') {
     return [];
   }
-  if (!isFirstRule(component, ctx.allComponents, 'copilot', scope)) return [];
-  const rules = selectAndSortRules(ctx.allComponents, 'copilot', scope);
-  const content = `# Rules\n\n${renderRulesSections(rules)}`;
+
+  const sections: string[] = [];
+  if (rules.length > 0) sections.push(`# Rules\n\n${renderRulesSections(rules)}`);
+  if (skills.length > 0) {
+    const skillSections = skills
+      .map((s) => `## ${s.manifest.name}\n\n${s.body.trim()}\n`)
+      .join('\n');
+    sections.push(`# Skills\n\n${skillSections}`);
+  }
+  if (sections.length === 0) return [];
+  const content = sections.join('\n');
   return [{ path: 'copilot-instructions.md', content }];
 }
