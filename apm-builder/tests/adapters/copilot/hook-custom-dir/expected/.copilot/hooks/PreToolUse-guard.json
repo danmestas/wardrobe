@@ -1,0 +1,6 @@
+{
+  "event": "PreToolUse",
+  "matcher": "Bash",
+  "command": "scripts/guard.sh",
+  "type": "command"
+}
