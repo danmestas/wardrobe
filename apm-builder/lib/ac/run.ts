@@ -7,7 +7,7 @@ import { findMode } from '../mode.ts';
 import { resolve, writeResolutionArtifact } from '../resolution.ts';
 import { discoverComponents } from '../discover.ts';
 import type { Target } from '../types.ts';
-import { prelaunchComposeClaudeCode, prelaunchComposeCodex, prelaunchComposeCopilot } from './prelaunch.ts';
+import { prelaunchComposeClaudeCode, prelaunchComposeGemini, prelaunchComposePi, prelaunchComposeCodex, prelaunchComposeCopilot } from './prelaunch.ts';
 
 export interface ParsedAcArgs {
   harness: string;
@@ -149,6 +149,32 @@ export async function runAc(argv: string[], deps: RunDeps = {}): Promise<number>
       : undefined;
     const found = args.mode ? await findMode(args.mode, dirs) : undefined;
     const result = await prelaunchComposeClaudeCode({
+      realHome: deps.homeDir ?? os.homedir(),
+      persona: personaManifest,
+      mode: found?.manifest,
+      modeBody: found?.body,
+    });
+    env.HOME = result.tempHome;
+    cleanup = result.cleanup;
+  } else if (!args.noFilter && target === 'gemini' && (args.persona || args.mode)) {
+    const personaManifest = args.persona
+      ? (await findPersona(args.persona, dirs)).manifest
+      : undefined;
+    const found = args.mode ? await findMode(args.mode, dirs) : undefined;
+    const result = await prelaunchComposeGemini({
+      realHome: deps.homeDir ?? os.homedir(),
+      persona: personaManifest,
+      mode: found?.manifest,
+      modeBody: found?.body,
+    });
+    env.HOME = result.tempHome;
+    cleanup = result.cleanup;
+  } else if (!args.noFilter && target === 'pi' && (args.persona || args.mode)) {
+    const personaManifest = args.persona
+      ? (await findPersona(args.persona, dirs)).manifest
+      : undefined;
+    const found = args.mode ? await findMode(args.mode, dirs) : undefined;
+    const result = await prelaunchComposePi({
       realHome: deps.homeDir ?? os.homedir(),
       persona: personaManifest,
       mode: found?.manifest,

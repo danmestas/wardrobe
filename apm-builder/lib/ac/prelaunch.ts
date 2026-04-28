@@ -86,19 +86,23 @@ import { composeHarnessHome } from './symlink-farm.ts';
 import { loadHarnessCatalog } from './harness-catalog.ts';
 import type { PersonaManifest, ModeManifest } from '../schema.ts';
 
-export interface ClaudePrelaunchOptions {
+export interface HomeOverridePrelaunchOptions {
   realHome: string;
   persona?: PersonaManifest;
   mode?: ModeManifest;
   modeBody?: string;
 }
 
-export async function prelaunchComposeClaudeCode(
-  opts: ClaudePrelaunchOptions,
+/** @deprecated Use HomeOverridePrelaunchOptions */
+export type ClaudePrelaunchOptions = HomeOverridePrelaunchOptions;
+
+async function composeWithHomeOverride(
+  target: 'claude-code' | 'gemini' | 'pi',
+  opts: HomeOverridePrelaunchOptions,
 ): Promise<{ tempHome: string; cleanup: () => Promise<void> }> {
-  const catalog = await loadHarnessCatalog('claude-code', opts.realHome);
+  const catalog = await loadHarnessCatalog(target, opts.realHome);
   const resolution = await resolveAgainstHarness({
-    target: 'claude-code',
+    target,
     harnessHome: opts.realHome,
     persona: opts.persona,
     mode: opts.mode,
@@ -107,9 +111,23 @@ export async function prelaunchComposeClaudeCode(
   const skillsKeep = opts.persona || opts.mode
     ? skillsKeepFromResolution(catalog, resolution.skillsDrop)
     : catalog.filter((c) => c.manifest.type === 'skill').map((c) => c.manifest.name); // no filter → keep all
-  return composeHarnessHome({
-    target: 'claude-code',
-    realHome: opts.realHome,
-    skillsKeep,
-  });
+  return composeHarnessHome({ target, realHome: opts.realHome, skillsKeep });
+}
+
+export async function prelaunchComposeClaudeCode(
+  opts: HomeOverridePrelaunchOptions,
+): Promise<{ tempHome: string; cleanup: () => Promise<void> }> {
+  return composeWithHomeOverride('claude-code', opts);
+}
+
+export async function prelaunchComposeGemini(
+  opts: HomeOverridePrelaunchOptions,
+): Promise<{ tempHome: string; cleanup: () => Promise<void> }> {
+  return composeWithHomeOverride('gemini', opts);
+}
+
+export async function prelaunchComposePi(
+  opts: HomeOverridePrelaunchOptions,
+): Promise<{ tempHome: string; cleanup: () => Promise<void> }> {
+  return composeWithHomeOverride('pi', opts);
 }
