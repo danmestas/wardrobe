@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runAc } from './lib/ac/run.ts';
-import { listCommand } from './lib/ac/introspect.ts';
+import { listCommand, showCommand, doctorCommand } from './lib/ac/introspect.ts';
 
 const argv = process.argv.slice(2);
 const homeDirs = () => ({
@@ -21,6 +21,31 @@ async function main(): Promise<number> {
     }
     await listCommand(what, { ...homeDirs(), print: (l) => process.stdout.write(l + '\n') });
     return 0;
+  }
+  if (argv[0] === 'show') {
+    const kind = argv[1];
+    if (kind !== 'persona' && kind !== 'mode' && kind !== 'effective') {
+      process.stderr.write('ac show: expected "persona <name>" | "mode <name>" | "effective ..."\n');
+      return 2;
+    }
+    const name = argv[2];
+    await showCommand(
+      { kind: kind as 'persona' | 'mode' | 'effective', name },
+      { ...homeDirs(), print: (l) => process.stdout.write(l + '\n') },
+    );
+    return 0;
+  }
+  if (argv[0] === 'doctor') {
+    const harnessConfigRoots = {
+      'claude-code': path.join(os.homedir(), '.claude'),
+      apm: path.join(os.homedir(), '.apm'),
+      gemini: path.join(os.homedir(), '.gemini'),
+      pi: path.join(os.homedir(), '.pi'),
+    };
+    return doctorCommand({
+      harnessConfigRoots,
+      print: (l) => process.stdout.write(l + '\n'),
+    });
   }
   // Default: ac <harness> [flags] -- <harness args>
   return runAc(argv);

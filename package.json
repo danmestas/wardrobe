@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "bin": {
+    "apm-builder": "./apm-builder/cli.ts",
+    "ac": "./apm-builder/ac.ts"
+  },
   "scripts": {
     "validate": "tsx apm-builder/cli.ts validate",
     "build": "tsx apm-builder/cli.ts build",

@@ -1,5 +1,7 @@
-import { listAllPersonas, type DiscoveryDirs } from '../persona.ts';
-import { listAllModes } from '../mode.ts';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { listAllPersonas, findPersona, type DiscoveryDirs } from '../persona.ts';
+import { listAllModes, findMode } from '../mode.ts';
 
 export interface IntrospectDeps extends DiscoveryDirs {
   print: (line: string) => void;
@@ -28,4 +30,79 @@ export async function listCommand(
       deps.print(`${m.manifest.name.padEnd(20)} v${m.manifest.version.padEnd(8)} [${m.source}]  ${m.manifest.description}`);
     }
   }
+}
+
+export interface ShowOptions {
+  kind: 'persona' | 'mode' | 'effective';
+  name?: string;
+  persona?: string;
+  mode?: string;
+}
+
+export async function showCommand(
+  opts: ShowOptions,
+  deps: IntrospectDeps,
+): Promise<void> {
+  if (opts.kind === 'persona') {
+    if (!opts.name) throw new Error('ac show persona <name>: name required');
+    const f = await findPersona(opts.name, deps);
+    deps.print(`name: ${f.manifest.name}`);
+    deps.print(`version: ${f.manifest.version}`);
+    deps.print(`source: ${f.source} (${f.filepath})`);
+    deps.print(`description: ${f.manifest.description}`);
+    deps.print(`targets: ${f.manifest.targets.join(', ')}`);
+    deps.print(`categories: ${f.manifest.categories.join(', ')}`);
+    deps.print(`skill_include: ${(f.manifest.skill_include ?? []).join(', ')}`);
+    deps.print(`skill_exclude: ${(f.manifest.skill_exclude ?? []).join(', ')}`);
+    if (f.body.trim()) {
+      deps.print('');
+      deps.print('--- body ---');
+      deps.print(f.body.trim());
+    }
+    return;
+  }
+  if (opts.kind === 'mode') {
+    if (!opts.name) throw new Error('ac show mode <name>: name required');
+    const f = await findMode(opts.name, deps);
+    deps.print(`name: ${f.manifest.name}`);
+    deps.print(`version: ${f.manifest.version}`);
+    deps.print(`source: ${f.source} (${f.filepath})`);
+    deps.print(`description: ${f.manifest.description}`);
+    deps.print(`targets: ${f.manifest.targets.join(', ')}`);
+    deps.print(`categories: ${f.manifest.categories.join(', ')}`);
+    deps.print(`skill_include: ${(f.manifest.skill_include ?? []).join(', ')}`);
+    deps.print(`skill_exclude: ${(f.manifest.skill_exclude ?? []).join(', ')}`);
+    deps.print('');
+    deps.print('--- mode prompt body (injected as additional context when active) ---');
+    deps.print(f.body.trim());
+    return;
+  }
+  // 'effective' is wired in the run.ts flow path; printed here.
+  throw new Error('ac show effective: not yet implemented');
+}
+
+export interface DoctorDeps {
+  /** Map from target name → expected install root (the dir where the filter hook should live). */
+  harnessConfigRoots: Record<string, string>;
+  print: (line: string) => void;
+}
+
+export async function doctorCommand(deps: DoctorDeps): Promise<number> {
+  let problems = 0;
+  for (const [target, root] of Object.entries(deps.harnessConfigRoots)) {
+    const expected = path.join(root, 'hooks', `ac-filter-${target}`);
+    try {
+      await fs.access(expected);
+      deps.print(`[ok]  ${target}: ${expected}`);
+    } catch {
+      deps.print(`[!!]  ${target}: missing ${expected}`);
+      problems += 1;
+    }
+  }
+  if (problems > 0) {
+    deps.print('');
+    deps.print(`${problems} harness(es) missing filter hooks. Install with:`);
+    deps.print('  apm-builder install --target <harness>');
+  }
+  return problems === 0 ? 0 : 1;
 }
