@@ -47,7 +47,7 @@ export async function loadHarnessCatalog(
       relativeDir: `${layout.skillsDir}/${name}`,
       dir: path.join(skillsRoot, name),
       body: parsed.content,
-      manifest: parsed.data as any,
+      manifest: { type: 'skill', ...parsed.data } as any,
     });
   }
   return out;
