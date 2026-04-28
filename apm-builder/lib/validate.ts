@@ -159,7 +159,7 @@ async function loadValidCategories(repoRoot: string): Promise<Set<string>> {
   const text = await fs.readFile(taxonomyPath, 'utf8');
   // Categories appear as ### headings: "### 1. Economy", "### 2. Workflow", ...
   const matches = text.matchAll(/^### \d+\.\s+(\w[\w-]*)/gm);
-  return new Set(Array.from(matches, (m) => m[1].toLowerCase()));
+  return new Set(Array.from(matches, (m) => m[1]!.toLowerCase()));
 }
 
 /**

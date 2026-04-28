@@ -16,7 +16,7 @@ const adapters = [
   ['pi', piAdapter],
 ] as const;
 
-const ctx: AdapterContext = { allComponents: [], config: {} };
+const ctx: AdapterContext = { allComponents: [], config: {}, repoRoot: '/tmp' };
 
 function fixture(type: 'persona' | 'mode'): ComponentSource {
   return {
