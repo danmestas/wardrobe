@@ -35,25 +35,19 @@ export const copilotAdapter: Adapter = {
   },
 };
 
-function emitInstructions(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
-  // Collect all components contributing to copilot-instructions.md.
-  const rules = selectRules(ctx.allComponents, 'copilot', 'project');
-  const skills = ctx.allComponents
+/**
+ * Compose copilot-instructions.md content from a filtered set of components.
+ * Exported so the CLI `docs --target copilot` can reuse it directly.
+ */
+export function composeCopilotInstructions(allComponents: ComponentSource[]): string {
+  const rules = selectRules(allComponents, 'copilot', 'project');
+  const skills = allComponents
     .filter(
       (c) =>
         c.manifest.type === 'skill' &&
         c.manifest.targets.includes('copilot'),
     )
     .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
-
-  // Pick a canonical owner: alphabetically-first project rule, or, if no rules, alphabetically-first skill.
-  const owner = rules[0] ?? skills[0];
-  if (!owner || owner.manifest.name !== component.manifest.name) return [];
-
-  // For rule components that are user-scoped, opt out (Copilot has no user scope).
-  if (component.manifest.type === 'rules' && (component.manifest.scope ?? 'project') !== 'project') {
-    return [];
-  }
 
   const sections: string[] = [];
   if (rules.length > 0) sections.push(`# Rules\n\n${composeRulesBody(rules)}`);
@@ -63,8 +57,32 @@ function emitInstructions(component: ComponentSource, ctx: AdapterContext): Emit
       .join('\n');
     sections.push(`# Skills\n\n${skillSections}`);
   }
-  if (sections.length === 0) return [];
-  const content = sections.join('\n');
+  return sections.join('\n');
+}
+
+function emitInstructions(component: ComponentSource, ctx: AdapterContext): EmittedFile[] {
+  const allComponents = ctx.allComponents;
+
+  // Pick a canonical owner: alphabetically-first project rule, or, if no rules, alphabetically-first skill.
+  const rules = selectRules(allComponents, 'copilot', 'project');
+  const skills = allComponents
+    .filter(
+      (c) =>
+        c.manifest.type === 'skill' &&
+        c.manifest.targets.includes('copilot'),
+    )
+    .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name));
+
+  const owner = rules[0] ?? skills[0];
+  if (!owner || owner.manifest.name !== component.manifest.name) return [];
+
+  // For rule components that are user-scoped, opt out (Copilot has no user scope).
+  if (component.manifest.type === 'rules' && (component.manifest.scope ?? 'project') !== 'project') {
+    return [];
+  }
+
+  const content = composeCopilotInstructions(allComponents);
+  if (!content) return [];
   return [{ path: 'copilot-instructions.md', content }];
 }
 
