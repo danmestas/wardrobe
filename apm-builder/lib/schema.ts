@@ -89,9 +89,19 @@ export const PersonaSchema = ManifestBaseSchema.extend({
 
 export type PersonaManifest = z.infer<typeof PersonaSchema>;
 
+export const ModeSchema = ManifestBaseSchema.extend({
+  type: z.literal('mode'),
+  categories: z.array(z.string()).min(0),
+  skill_include: z.array(z.string()).default([]),
+  skill_exclude: z.array(z.string()).default([]),
+}).strict();
+
+export type ModeManifest = z.infer<typeof ModeSchema>;
+
 export const ManifestSchema = z.discriminatedUnion('type', [
   ManifestBaseSchema,
   PersonaSchema,
+  ModeSchema,
 ]);
 
 export type Manifest = z.infer<typeof ManifestSchema>;
