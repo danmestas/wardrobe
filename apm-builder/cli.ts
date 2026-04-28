@@ -9,6 +9,8 @@ import { validateComponents } from './lib/validate.ts';
 import { runBuild } from './lib/build.ts';
 import { matchesGlob } from './lib/glob.ts';
 import { updateReadme } from './lib/docs.ts';
+import { composeAgentsMd } from './lib/agents-md.ts';
+import { composeCopilotInstructions } from './adapters/copilot.ts';
 import { TARGETS, type Target } from './lib/types.ts';
 import { listImplementedTargets } from './adapters/index.ts';
 import { runEvolution } from './lib/evolution/orchestrator.ts';
@@ -125,14 +127,53 @@ const watchCmd = defineCommand({
 
 const docsCmd = defineCommand({
   meta: { name: 'docs', description: 'Regenerate the components table in README.md (preserves hand-written sections)' },
-  async run() {
-    const repoRoot = process.cwd();
-    const readmePath = path.join(repoRoot, 'README.md');
-    const components = await discoverComponents(repoRoot);
-    const existing = await fs.readFile(readmePath, 'utf8').catch(() => null);
-    const md = updateReadme(existing, components);
-    await fs.writeFile(readmePath, md);
-    console.log(pc.green(`wrote README.md (${components.length} components).`));
+  args: {
+    target: { type: 'string', description: 'Filter docs to a specific harness target (codex | copilot)' },
+    resolution: { type: 'string', description: 'Path to resolution artifact (filters skills per skillsDrop)' },
+    out: { type: 'string', description: 'Output path (default: AGENTS.md or copilot-instructions.md per target)' },
+    repo: { type: 'string', description: 'Repo root to discover components from (default: cwd)' },
+  },
+  async run({ args }) {
+    const repoRoot = args.repo ?? process.cwd();
+
+    if (!args.target) {
+      // Default behavior: regenerate README.md components table.
+      const readmePath = path.join(repoRoot, 'README.md');
+      const components = await discoverComponents(repoRoot);
+      const existing = await fs.readFile(readmePath, 'utf8').catch(() => null);
+      const md = updateReadme(existing, components);
+      await fs.writeFile(readmePath, md);
+      console.log(pc.green(`wrote README.md (${components.length} components).`));
+      return;
+    }
+
+    // Load resolution artifact for filtering if provided.
+    let drop: Set<string> | null = null;
+    if (args.resolution) {
+      const r = JSON.parse(await fs.readFile(args.resolution, 'utf8'));
+      drop = new Set<string>(r.skillsDrop ?? []);
+    }
+
+    // Discover and filter components.
+    const allComponents = await discoverComponents(repoRoot);
+    const components = drop
+      ? allComponents.filter((c) => c.manifest.type !== 'skill' || !drop!.has(c.manifest.name))
+      : allComponents;
+
+    if (args.target === 'codex') {
+      const outPath = args.out ?? path.join(repoRoot, 'AGENTS.md');
+      const content = composeAgentsMd({ target: 'codex', components, sectionOrder: ['rules', 'agents', 'skills'] });
+      await fs.writeFile(outPath, content);
+      console.log(pc.green(`wrote ${outPath} (${components.length} components).`));
+    } else if (args.target === 'copilot') {
+      const outPath = args.out ?? path.join(repoRoot, 'copilot-instructions.md');
+      const content = composeCopilotInstructions(components);
+      await fs.writeFile(outPath, content);
+      console.log(pc.green(`wrote ${outPath} (${components.length} components).`));
+    } else {
+      console.log(pc.red(`unknown target: ${args.target}. Valid: codex, copilot`));
+      process.exit(1);
+    }
   },
 });
 

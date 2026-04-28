@@ -53,13 +53,13 @@ const LicenseAttribution = z
   .strict();
 const LicenseField = z.union([z.string(), LicenseAttribution]);
 
-export const ManifestSchema = z
+const ManifestBaseSchema = z
   .object({
     name: z.string().regex(NAME_RE, 'name must be kebab-case lowercase'),
     version: z.string().regex(SEMVER_RE, 'version must be valid semver'),
     description: z.string().min(1),
     category: CategoryBlock.optional(),
-    type: z.enum(COMPONENT_TYPES as unknown as [ComponentType, ...ComponentType[]]),
+    type: z.enum(['skill', 'plugin', 'hook', 'agent', 'rules', 'mcp'] as const),
     targets: z.array(z.enum(TARGETS as unknown as [Target, ...Target[]])).min(1),
     author: z.string().optional(),
     license: LicenseField.optional(),
@@ -79,5 +79,29 @@ export const ManifestSchema = z
       .optional(),
   })
   .strict();
+
+export const PersonaSchema = ManifestBaseSchema.extend({
+  type: z.literal('persona'),
+  categories: z.array(z.string()).min(0),
+  skill_include: z.array(z.string()).default([]),
+  skill_exclude: z.array(z.string()).default([]),
+}).strict();
+
+export type PersonaManifest = z.infer<typeof PersonaSchema>;
+
+export const ModeSchema = ManifestBaseSchema.extend({
+  type: z.literal('mode'),
+  categories: z.array(z.string()).min(0),
+  skill_include: z.array(z.string()).default([]),
+  skill_exclude: z.array(z.string()).default([]),
+}).strict();
+
+export type ModeManifest = z.infer<typeof ModeSchema>;
+
+export const ManifestSchema = z.discriminatedUnion('type', [
+  ManifestBaseSchema,
+  PersonaSchema,
+  ModeSchema,
+]);
 
 export type Manifest = z.infer<typeof ManifestSchema>;

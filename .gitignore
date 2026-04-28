@@ -3,9 +3,10 @@
 .agents/
 .codex/
 .worktrees/
-docs/
 node_modules/
 dist/
 release-artifacts/
 *.tsbuildinfo
 .vitest-cache/
+docs/superpowers/specs/
+docs/superpowers/plans/

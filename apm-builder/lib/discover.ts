@@ -4,7 +4,16 @@ import matter from 'gray-matter';
 import { ManifestSchema } from './schema.ts';
 import type { ComponentSource } from './types.ts';
 
-const COMPONENT_DIRS = ['skills', 'plugins', 'rules', 'hooks', 'agents', 'mcp'] as const;
+const COMPONENT_DIRS = ['skills', 'plugins', 'rules', 'hooks', 'agents', 'mcp', 'personas', 'modes'] as const;
+
+const DIR_FILENAME: Partial<Record<string, string>> = {
+  personas: 'persona.md',
+  modes: 'mode.md',
+};
+
+function getComponentFilename(dir: string): string {
+  return DIR_FILENAME[dir] ?? 'SKILL.md';
+}
 
 export async function discoverComponents(repoRoot: string): Promise<ComponentSource[]> {
   const components: ComponentSource[] = [];
@@ -19,7 +28,7 @@ export async function discoverComponents(repoRoot: string): Promise<ComponentSou
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       const componentDir = path.join(dir, entry.name);
-      const skillPath = path.join(componentDir, 'SKILL.md');
+      const skillPath = path.join(componentDir, getComponentFilename(top));
       const skillExists = await fs.stat(skillPath).then(() => true).catch(() => false);
       if (!skillExists) continue;
       const raw = await fs.readFile(skillPath, 'utf8');
