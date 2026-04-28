@@ -48,7 +48,7 @@ if [[ "${REAL_MODE:-false}" == "true" ]]; then
     claude|claude-code) REAL_CMD=(claude --print "reply with just the four characters PING and stop") ;;
     codex)              REAL_CMD=(codex exec "reply with just the four characters PING and stop") ;;
     gemini)             REAL_CMD=(gemini --skip-trust -p "reply with just the four characters PING and stop") ;;
-    pi)                 REAL_CMD=(pi --provider anthropic --print "reply with just the four characters PING and stop") ;;
+    pi)                 REAL_CMD=(pi --provider openrouter --print "reply with just the four characters PING and stop") ;;
     *) echo "FAIL: unknown harness $harness"; exit 1 ;;
   esac
   output=$(node "$TSX" "$AC" "$harness" --no-filter -- "${REAL_CMD[@]:1}" 2>&1)

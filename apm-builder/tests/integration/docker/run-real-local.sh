@@ -50,4 +50,8 @@ docker run --rm \
   -v "$TMP_AUTH/.claude.json:/host-auth/.claude.json:ro" \
   -v "$TMP_AUTH/.codex:/host-auth/.codex:ro" \
   -v "$TMP_AUTH/.gemini:/host-auth/.gemini:ro" \
+  ${OPENROUTER_API_KEY:+-e OPENROUTER_API_KEY} \
+  ${ANTHROPIC_API_KEY:+-e ANTHROPIC_API_KEY} \
+  ${OPENAI_API_KEY:+-e OPENAI_API_KEY} \
+  ${GEMINI_API_KEY:+-e GEMINI_API_KEY} \
   agent-config-test --real "$@"

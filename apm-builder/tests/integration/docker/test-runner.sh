@@ -93,7 +93,7 @@ declare -A HARNESS_AUTH
 # In real mode, require an explicit provider env var (ANTHROPIC_API_KEY,
 # OPENAI_API_KEY, or GEMINI_API_KEY). In shim mode, just check ANTHROPIC.
 if $REAL_MODE; then
-  [[ -n "${ANTHROPIC_API_KEY:-}" || -n "${OPENAI_API_KEY:-}" || -n "${GEMINI_API_KEY:-}" ]] && HARNESS_AUTH[pi]=ok || HARNESS_AUTH[pi]=
+  [[ -n "${ANTHROPIC_API_KEY:-}" || -n "${OPENAI_API_KEY:-}" || -n "${GEMINI_API_KEY:-}" || -n "${OPENROUTER_API_KEY:-}" ]] && HARNESS_AUTH[pi]=ok || HARNESS_AUTH[pi]=
 else
   [[ -n "${ANTHROPIC_API_KEY:-}" || -f "$HOME/.claude.json" || -f "$HOME/.claude/.credentials.json" ]] && HARNESS_AUTH[pi]=ok || HARNESS_AUTH[pi]=
 fi
