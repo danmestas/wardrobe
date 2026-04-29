@@ -82,90 +82,53 @@ and troubleshooting.
 
 ## Categories
 
+Each link points at the component's own directory — open the `SKILL.md` (or agent / hook file) inside for the full writeup. The auto-generated [Components table](#components) below has descriptions for every entry.
+
 ### Software design philosophy (BackPressure)
 
-- [`ousterhout`](skills/ousterhout) — *A Philosophy of Software Design*: deep modules, information hiding, strategic programming, minimizing cognitive load.
-- [`hipp`](skills/hipp) — D. Richard Hipp's principles (SQLite, Fossil): zero-config, embedded, simplicity, built to last decades.
-- [`norman`](skills/norman) — Don Norman's interaction-design principles: affordances, signifiers, mapping, feedback, error prevention.
-- [`tigerstyle`](skills/tigerstyle) — TigerBeetle's NASA Power-of-Ten safety-critical discipline: assertion-heavy development, zero technical debt.
-- [`idiomatic-go`](skills/idiomatic-go) — Go style and idioms (Bodner's *Learning Go*): error handling, slices, interfaces, concurrency.
-- [`dx-audit`](skills/dx-audit) — Workflow-based DX/UX scoring with weighted friction analysis and ranked improvements.
+[ousterhout](skills/ousterhout) · [hipp](skills/hipp) · [norman](skills/norman) · [tigerstyle](skills/tigerstyle) · [idiomatic-go](skills/idiomatic-go) · [dx-audit](skills/dx-audit)
+
+### Frontend & forms (Tooling)
+
+[shadcn-forms](skills/shadcn-forms) · [vitaly](skills/vitaly) · [datastar](skills/datastar) · [datastar-tao](skills/datastar-tao) · [datastar-patterns](skills/datastar-patterns)
 
 ### Development tooling (Tooling)
 
-- [`mgrep-code-search`](skills/mgrep-code-search) — Semantic code search for large codebases. Natural-language queries across code, text, PDFs, and images.
-- [`apm-builder`](skills/apm-builder) — This repo's build tool itself. Validate, build, watch, scaffold, regenerate docs, run `evolve`.
-- [`cloudflare-email`](skills/cloudflare-email) — Send outbound email from Cloudflare-hosted domains via REST API or Workers binding.
-- [`pikchr-generator`](skills/pikchr-generator) — Generate, theme, and render technical diagrams across four engines (Pikchr, GraphViz, D2, Mermaid) with a shared 16-theme palette.
-- [`career-interview`](skills/career-interview) — Conducts deep conversational career interviews to build structured profiles for technical professionals. Triggers on "interview me", "build my career profile", "/career-interview".
+[mgrep-code-search](skills/mgrep-code-search) · [apm-builder](skills/apm-builder) · [cloudflare-email](skills/cloudflare-email) · [pikchr-generator](skills/pikchr-generator) · [career-interview](skills/career-interview)
 
 ### Workflow
 
-- [`tts-announcer`](hooks/tts-announcer) — Local, offline voice announcements via Kokoro-82M. Wires `Notification` + `SubagentStop` hooks so the terminal whispers progress instead of going *bing*. Targets Claude Code and Pi.
-- [`orchestrator-mode`](skills/orchestrator-mode) — Primes a host Claude Code session as the Darkish Factory pipeline orchestrator (the §7 loop, 13-role roster, escalation classifier, audit-log conventions).
-- [`subagent-to-subharness`](skills/subagent-to-subharness) — Translates Agent-tool muscle memory into containerized `darkish spawn` dispatch. Decision tree, role mapping, framing examples.
+[orchestrator-mode](skills/orchestrator-mode) · [subagent-to-subharness](skills/subagent-to-subharness) · [tts-announcer](hooks/tts-announcer)
 
 ### Project & process (Integrations)
 
-- [`linear-method`](skills/linear-method) — The Linear Method: plain-language issues, 4-priority system, cycles, backlog hygiene.
-- [`gh-project-charter`](skills/gh-project-charter) — GitHub Projects V2 charter management: goals, scope, success criteria, change log.
-- [`gh-project-setup`](skills/gh-project-setup) — Create and configure GitHub Projects V2 with template selection (kanban, bug-tracker, feature-dev, roadmap, etc.).
-- [`gh-project-operations`](skills/gh-project-operations) — Daily GitHub Projects V2 operations: issue CRUD, status changes, bulk ops, CSV import/export.
-- [`gh-project-shared`](skills/gh-project-shared) — Shared utilities for the `gh-project-*` skills (CLI validation, auth checks, config). Not directly invoked.
-
-### Knowledge base (ContextManagement / MemoryManagement)
-
-Bundled as the [`knowledge-base`](plugins/knowledge-base) plugin (install once for all 11 skills below).
-
-- [`knowledge-base-overview`](skills/knowledge-base-overview) — Philosophy preface: the LLM writes the wiki, the human curates.
-- [`vault-overview`](skills/vault-overview) — Vault scaffolding, cross-project referencing, hot cache.
-- [`vault-ingest`](skills/vault-ingest) — Ingest sources (files, URLs, batches) into the vault.
-- [`vault-query`](skills/vault-query) — Query across accumulated notes.
-- [`vault-lint`](skills/vault-lint) — Vault hygiene checks.
-- [`vault-save`](skills/vault-save) — Save query/conversation outputs back into the vault.
-- [`autoresearch`](skills/autoresearch) — Autonomous research that updates the vault as it goes.
-- [`defuddle`](skills/defuddle) — Strip web clutter (ads, nav, boilerplate) before ingest.
-- [`obsidian-canvas`](skills/obsidian-canvas) — Visual reference layer authoring.
-- [`obsidian-bases`](skills/obsidian-bases) — Obsidian Bases (.base file) authoring.
-- [`obsidian-markdown`](skills/obsidian-markdown) — Obsidian Flavored Markdown authoring.
-
-### Evolution
-
-- [`evolution-engine`](skills/evolution-engine) — Read recent session transcripts, detect recurring friction patterns, emit unified-diff fixes against existing skills/configs/memory. CLI: `npm run evolve`.
-- [`skill-gap-detector`](skills/skill-gap-detector) — Find *missing* skills (not edits) by scanning sessions for "I had to explain X 3+ times" clusters. Drafts proposed SKILL.md files under `~/.claude/evolution-reports/<project>/proposed-skills/` for human review.
-- [`reflect`](skills/reflect) — Structured post-task critique. Five sections (summary / went well / didn't / proposals / open questions) → markdown report. No auto-apply.
-- [`memorize`](skills/memorize) — Pairs with `/reflect`. Converts an agreed proposal or insight into a project ADR (`docs/adr/`) or personal memory (`~/.claude/projects/<project>/memory/`). Always confirms content first.
-- [`skill-eval-runner`](skills/skill-eval-runner) — Binary pass/fail evals (no scoring, per MindStudio research) for skill descriptions. Reads `skills/<name>/tests/evals.json`. Auto-fires after SKILL.md edits.
-- [`description-linter`](skills/description-linter) — Static analyzer for SKILL.md frontmatter: trigger-phrase heuristics, length cap, kebab-case names, cross-skill conflict detection. Reports only — no auto-fix.
-- [`stuck-detector`](skills/stuck-detector) — Off-ramp when the agent (or user) hits a doom-loop. Stops retrying, writes a structured handoff, asks whether to escalate / pause / continue with reduced scope.
-- [`evolution-changelog`](skills/evolution-changelog) — Maintains `EVOLUTION.md` at repo root: append-only log of applied evolution-driven changes, one bullet per change with signal, file, and one-line rationale.
-- [`trace`](hooks/trace) — Hook that appends one JSONL record per tool call to `.agent-config/trace/<session-id>.jsonl`. Zero LLM cost; structured evidence for `reflect` and `stuck-detector` to read later.
-- [`recall`](hooks/recall) — `SessionStart` hook that injects recent feedback memories and ADRs into the session as additional context. Default ON; opt out with `.agent-config/recall.disabled`.
-
-### Frontend frameworks (Tooling)
-
-- [`datastar`](skills/datastar) — Datastar framework intro: hypermedia, backend-driven SSE, no client framework, no build step.
-- [`datastar-tao`](skills/datastar-tao) — *The Tao of Datastar*: hypermedia philosophy, backend-owned state, SSE, DOM morphing.
-- [`datastar-patterns`](skills/datastar-patterns) — Datastar UI implementation patterns: search, inline editing, infinite scroll, file upload, validation, polling.
+[linear-method](skills/linear-method) · [atlassian-cli-jira](skills/atlassian-cli-jira) · [gh-project-charter](skills/gh-project-charter) · [gh-project-setup](skills/gh-project-setup) · [gh-project-operations](skills/gh-project-operations) · [gh-project-shared](skills/gh-project-shared)
 
 ### Integrations & data
 
-- [`signoz-dashboard-builder`](skills/signoz-dashboard-builder) — Build SigNoz dashboards via MCP API (metrics, logs, traces, telemetry panels).
-- [`apple-contacts`](skills/apple-contacts) — Apple Contacts CRUD via the `contactbook` CLI (macOS only).
-- [`atlassian-cli-jira`](skills/atlassian-cli-jira) — Manage Jira Cloud via Atlassian CLI (`acli`): search, create, edit, transition, bulk ops, sprints.
-- [`deterministic-simulation-testing`](skills/deterministic-simulation-testing) — Collapse distributed systems into single-threaded simulations: BUGGIFY fault injection, VOPR patterns.
-- [`doppler`](skills/doppler) — Migrate `.env` files to Doppler secrets management; multi-environment configs.
-- [`midscene-testing`](skills/midscene-testing) — Screenshot-driven browser smoke testing via Midscene's headless Puppeteer mode.
+[signoz-dashboard-builder](skills/signoz-dashboard-builder) · [apple-contacts](skills/apple-contacts) · [deterministic-simulation-testing](skills/deterministic-simulation-testing) · [doppler](skills/doppler) · [midscene-testing](skills/midscene-testing)
 
-## Agents (wshobson-sourced)
+### Knowledge base (ContextManagement / MemoryManagement)
 
-Subagents vendored from [`wshobson/agents`](https://github.com/wshobson/agents) (MIT, see [`LICENSES/wshobson-agents.LICENSE`](LICENSES/wshobson-agents.LICENSE)). These are the first components under `agents/` and live as `type: agent` in the canonical schema; the upstream `model:` field is dropped at vendor time so the adapter layer picks model per harness at install. Bodies are kept verbatim from upstream.
+Bundled as the [knowledge-base](plugins/knowledge-base) plugin — install once for all 11 skills.
 
-- [`code-reviewer`](agents/code-reviewer) — *backpressure*. Elite code review expert focused on AI-assisted analysis, security, performance, and production reliability. Pairs with `dx-audit` and `description-linter` for content/quality feedback (this one is for source code).
-- [`debugger`](agents/debugger) — *backpressure*. Root-cause debugging specialist for errors, test failures, and unexpected behavior. Use proactively. Distinct from `stuck-detector`, which is the off-ramp when retries don't converge.
-- [`golang-pro`](agents/golang-pro) — *workflow*. Go 1.21+ expert for concurrency patterns, generics, and production microservices. Sister to the `idiomatic-go` skill (style-and-idioms) — this one drives architecture and implementation.
-- [`architect-review`](agents/architect-review) — *backpressure*. Master software architect for clean architecture, DDD, microservices, and event-driven design reviews. Higher altitude than `ousterhout` and `hipp`, which review at the module level.
-- [`observability-engineer`](agents/observability-engineer) — *tooling*. Production-grade monitoring, tracing, SLI/SLO, and incident response. Complements `signoz-dashboard-builder`, which is the SigNoz-specific implementation skill.
+[knowledge-base-overview](skills/knowledge-base-overview) · [vault-overview](skills/vault-overview) · [vault-ingest](skills/vault-ingest) · [vault-query](skills/vault-query) · [vault-lint](skills/vault-lint) · [vault-save](skills/vault-save) · [autoresearch](skills/autoresearch) · [defuddle](skills/defuddle) · [obsidian-canvas](skills/obsidian-canvas) · [obsidian-bases](skills/obsidian-bases) · [obsidian-markdown](skills/obsidian-markdown)
+
+### Evolution
+
+[evolution-engine](skills/evolution-engine) · [skill-gap-detector](skills/skill-gap-detector) · [reflect](skills/reflect) · [memorize](skills/memorize) · [skill-eval-runner](skills/skill-eval-runner) · [description-linter](skills/description-linter) · [stuck-detector](skills/stuck-detector) · [evolution-changelog](skills/evolution-changelog) · [trace](hooks/trace) · [recall](hooks/recall)
+
+### Plugins
+
+Harness-specific plugin shells (no `SKILL.md`, not transpiled). Each has its own README.
+
+[knowledge-base](plugins/knowledge-base) · [monorepo-profiles](plugins/monorepo-profiles) · [career-interview](plugins/career-interview) · [gh-project-management](plugins/gh-project-management)
+
+### Agents
+
+`agents/` is wshobson-sourced (vendored from [wshobson/agents](https://github.com/wshobson/agents), MIT — see [`LICENSES/wshobson-agents.LICENSE`](LICENSES/wshobson-agents.LICENSE)); upstream `model:` fields are dropped so the adapter layer picks per harness. `gh-project-expert` is locally-authored and lives inside the `gh-project-management` plugin.
+
+[code-reviewer](agents/code-reviewer) · [debugger](agents/debugger) · [golang-pro](agents/golang-pro) · [architect-review](agents/architect-review) · [observability-engineer](agents/observability-engineer) · [gh-project-expert](plugins/gh-project-management/agents/gh-project-expert.md)
 
 ## Components
 
