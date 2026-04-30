@@ -14,7 +14,7 @@ This is a **one-time copy + diverge**. There is no automated resync from upstrea
 | `skills/using-bones-powers/SKILL.md` | `skills/using-superpowers/SKILL.md` | refactored — replaces "you have superpowers" with "you have bones-powers"; adds bones-primitives vocabulary section; drops codex/copilot tool-mapping refs |
 | `skills/brainstorming/SKILL.md` | `skills/brainstorming/SKILL.md` | refactored — spec output path → `docs/bones-powers/specs/`; commit mechanic → `bones repo add` + `bones repo ci` |
 | `skills/brainstorming/spec-document-reviewer-prompt.md` | same | verbatim copy |
-| `skills/brainstorming/visual-companion.md` | same | verbatim copy |
+| `skills/brainstorming/visual-companion.md` | same | refactored — replaced `.superpowers/brainstorm/` runtime paths with `.bones-powers/brainstorm/` |
 | `skills/writing-plans/SKILL.md` | `skills/writing-plans/SKILL.md` | refactored — adds `[slot: X]` annotation requirement; emits bones tasks per spec § 4.4 |
 | `skills/writing-plans/plan-document-reviewer-prompt.md` | same | verbatim copy |
 | `skills/executing-plans/SKILL.md` | `skills/executing-plans/SKILL.md` | refactored — replaces TodoWrite plan-tracking with `bones tasks list/claim/close` |
