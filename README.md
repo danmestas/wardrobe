@@ -1,8 +1,27 @@
 # agent-config
 
-Multi-harness AI agent configuration monorepo. Authors write skills, plugins, hooks, agents, rules, and MCP server configs once in canonical `SKILL.md` format; `apm-builder` emits per-harness artifacts for **Claude Code**, **APM**, **Codex**, **Gemini CLI**, **Copilot CLI**, and **Pi**.
+Multi-harness AI agent configuration monorepo. Authors write skills, plugins, hooks, agents, rules, and MCP server configs once in canonical `SKILL.md` format; [`suit`](https://github.com/danmestas/suit) emits per-harness artifacts for **Claude Code**, **APM**, **Codex**, **Gemini CLI**, **Copilot CLI**, and **Pi**.
 
 > **Status (2026-04-27):** All six adapters merged. All components on canonical frontmatter (`name` + `version` + `description` + `type` + `targets` + `category`); `npm run validate` runs cleanly across the repo and `npm run build -- --target all` emits artifacts for every harness.
+
+## Using this content with suit
+
+Install [suit](https://github.com/danmestas/suit) and point it at this repo:
+
+```bash
+npm install -g @agent-ops/suit
+suit init https://github.com/danmestas/agent-config
+suit list personas
+suit claude --persona backend --mode focused
+```
+
+Or for development against a local clone:
+
+```bash
+git clone https://github.com/danmestas/agent-config
+cd agent-config
+SUIT_CONTENT_PATH=$PWD suit list personas
+```
 
 ## Layout
 
@@ -17,7 +36,7 @@ rules/       — type: rules   (planned)
 mcp/         — type: mcp     (planned)
 ```
 
-`apm-builder/lib/discover.ts` walks all six top-level dirs.
+The suit-build discovery pipeline walks all six top-level dirs.
 
 ## Conventions
 
@@ -67,19 +86,6 @@ dependencies:
 
 Adapters emit native artifacts for each harness when a skill declares it in `targets:`. Run `npm run build -- --target <harness>` to generate the per-harness output under `dist/<harness>/`. Install paths follow each harness's convention.
 
-## Configuring with `ac`
-
-`ac` is a wrapper around your harness binary that activates a persona and/or
-mode for a single session, filtering skills and injecting prompt scaffolding.
-Today's full-load behavior is preserved when you don't use it.
-
-```bash
-ac claude --persona backend --mode focused
-```
-
-See [docs/USING-AC.md](docs/USING-AC.md) for installation, authoring personas,
-and troubleshooting.
-
 ## Categories
 
 Each link points at the component's own directory — open the `SKILL.md` (or agent / hook file) inside for the full writeup. The auto-generated [Components table](#components) below has descriptions for every entry.
@@ -94,7 +100,7 @@ Each link points at the component's own directory — open the `SKILL.md` (or ag
 
 ### Development tooling (Tooling)
 
-[mgrep-code-search](skills/mgrep-code-search) · [apm-builder](skills/apm-builder) · [cloudflare-email](skills/cloudflare-email) · [pikchr-generator](skills/pikchr-generator) · [career-interview](skills/career-interview)
+[mgrep-code-search](skills/mgrep-code-search) · [suit-build](skills/suit-build) · [cloudflare-email](skills/cloudflare-email) · [pikchr-generator](skills/pikchr-generator) · [career-interview](skills/career-interview)
 
 ### Workflow
 
@@ -278,15 +284,15 @@ Gantt/pie charts (a chart library), or rich data viz.
 ## Building
 
 ```bash
-npm install
 npm run validate -- --filter <name>     # validate one component
 npm run build -- --target claude-code   # build Claude Code artifacts
 npm run watch -- --target claude-code   # rebuild on change
 npm run docs                            # regenerate the components table above
 npm run init -- my-skill --type skill   # scaffold a new component
 npm run evolve -- --since 7d --dry-run  # detect friction patterns in session history
-npm test                                # run apm-builder unit tests
 ```
+
+Each script invokes [`suit-build`](https://github.com/danmestas/suit) via `npx -y -p @agent-ops/suit suit-build <cmd>` — no global install required.
 
 Available `--target` values: `claude-code`, `apm`, `codex`, `gemini`, `copilot`, `pi`, or `all`.
 
@@ -294,7 +300,7 @@ Available `--target` values: `claude-code`, `apm`, `codex`, `gemini`, `copilot`,
 
 ## Architecture
 
-For the full build-tool reference, read [`skills/apm-builder/SKILL.md`](skills/apm-builder/SKILL.md). For the design rationale, see [`TAXONOMY.md`](TAXONOMY.md).
+For the full build-tool reference, read [`skills/suit-build/SKILL.md`](skills/suit-build/SKILL.md). For the design rationale, see [`TAXONOMY.md`](TAXONOMY.md).
 
 The canonical source format is one `SKILL.md` per component with YAML frontmatter:
 
@@ -313,9 +319,9 @@ category:
 (skill body)
 ```
 
-Per-harness emission honors a compatibility matrix (see [`apm-builder/lib/validate.ts`](apm-builder/lib/validate.ts)) — not every component type works on every harness. The validator rejects incompatible combinations and warns on best-effort ones.
+Per-harness emission honors a compatibility matrix enforced by `suit-build validate` — not every component type works on every harness. The validator rejects incompatible combinations and warns on best-effort ones. See the [suit repo](https://github.com/danmestas/suit) for source.
 
-Component types: `skill`, `plugin`, `hook`, `agent`, `rules`, `mcp`. See [`apm-builder/lib/types.ts`](apm-builder/lib/types.ts) for the full manifest shape.
+Component types: `skill`, `plugin`, `hook`, `agent`, `rules`, `mcp`. See the [suit repo](https://github.com/danmestas/suit) for the full manifest shape.
 
 ## Companion repos
 
@@ -327,8 +333,8 @@ Repos that aren't component bundles but pair naturally with `agent-config`:
 ## Contributing
 
 - Branch from `main` and open a PR — direct pushes to `main` are not accepted.
-- Run `npm test` and `npx tsc --noEmit` before pushing; both must be green.
-- Keep commit messages focused and imperative (e.g., `feat(apm-builder): ...`, `docs: ...`).
+- Run `npm run validate` before pushing; it must be green.
+- Keep commit messages focused and imperative (e.g., `feat(skill): ...`, `docs: ...`).
 - Do not include AI-tool attribution in commit messages or PR bodies.
 - New skills follow the `kebab-case` directory convention under `skills/`. Plugins live under `plugins/`. See [`AGENTS.md`](AGENTS.md) for repo-level guidelines.
 
