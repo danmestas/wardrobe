@@ -11,7 +11,7 @@ When running on Pi, the following Claude Code tool names map to Pi equivalents.
 | `Glob` | (Pi pattern search) | File pattern matching |
 | `Grep` | (Pi content search) | File content search |
 | `TodoWrite` | (no equivalent) | Pi agents track tasks via Pi's task primitives or external files |
-| `Skill` | (Pi skill loading via package keyword `pi-package`) | Per `apm-builder.config.yaml` pi conventions, skills are loaded via Pi packages |
+| `Skill` | (Pi skill loading via package keyword `pi-package`) | Per `suit.config.yaml` pi conventions, skills are loaded via Pi packages |
 | `Agent` / `Task` | (Pi subagent / task delegation) | Refer to Pi docs for multi-agent orchestration |
 
 ## Translation notes
@@ -21,4 +21,4 @@ When running on Pi, the following Claude Code tool names map to Pi equivalents.
 - bones-powers' subagent-driven-development pattern depends on subagent dispatch — verify Pi's mechanism.
 - Pi-specific package conventions (the `pi-package` keyword) determine how bones-powers skills appear in a Pi installation; per-skill tool naming follows Pi's runtime conventions.
 
-(Note: this doc is best-effort based on Pi's apm-builder adapter conventions; verify against Pi's official docs when adopting.)
+(Note: this doc is best-effort based on Pi's suit-build adapter conventions; verify against Pi's official docs when adopting.)

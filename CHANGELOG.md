@@ -2,7 +2,7 @@
 
 The `agent-config` repo is a multi-harness component monorepo without a
 single canonical version tag at the repo root. Components are released
-through the `apm-builder` pipeline; sub-packages may carry their own tags
+through the [`suit-build`](https://github.com/danmestas/suit) pipeline; sub-packages may carry their own tags
 (e.g. `pikchr-generator@v0.2.0`).
 
 This file tracks notable monorepo-level changes — adoption of new patterns,

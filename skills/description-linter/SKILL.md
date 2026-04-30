@@ -42,7 +42,7 @@ If the description is purely abstract ("skill for design philosophy") with no qu
 
 ### 3. Name shape
 
-- Must be `kebab-case` (already enforced by Zod schema in `apm-builder/lib/schema.ts`, but call it out so the user sees the rule.)
+- Must be `kebab-case` (already enforced by the suit-build schema, but call it out so the user sees the rule.)
 - Must be ≤4 words / ≤30 chars. Long names are a smell — usually mean the skill does too much.
 
 ### 4. Conflict check (the load-bearing rule)
@@ -87,6 +87,6 @@ Roll-up at the bottom:
 
 ## See also
 
-- `apm-builder/lib/schema.ts` — kebab-case enforcement (already-running ground truth).
+- [suit](https://github.com/danmestas/suit) — kebab-case enforcement (already-running ground truth in `suit-build` schema).
 - `skills/skill-eval-runner/SKILL.md` — the dynamic complement (does the description actually trigger?).
 - `skills/evolution-engine/SKILL.md` — sibling that proposes diffs against descriptions when triggers are observed-failing.

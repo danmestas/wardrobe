@@ -18,17 +18,6 @@ npm run validate
 `npm run validate` checks that all components conform to the canonical
 schemas documented in `TAXONOMY.md` and `CONVENTIONS.md`.
 
-## Running tests
-
-```
-npm test            # full vitest suite
-npm run smoke       # smoke tests only
-npm run typecheck   # tsc --noEmit
-npm run test:watch  # watch mode
-```
-
-`npm test` and `npm run validate` together form the canonical pre-PR gate.
-
 ## Building
 
 ```
@@ -37,8 +26,9 @@ npm run watch       # rebuild on change
 npm run docs        # regenerate component docs
 ```
 
-The transpiler in `apm-builder/` reads canonical-format components and
-emits per-harness artifacts under `dist/` and `marketplace/`.
+The [`suit-build`](https://github.com/danmestas/suit) transpiler reads canonical-format components and
+emits per-harness artifacts under `dist/` and `marketplace/`. The build tool's
+own tests live in the suit repo; agent-config itself is content-only.
 
 ## Component types
 
@@ -46,7 +36,6 @@ emits per-harness artifacts under `dist/` and `marketplace/`.
 - `plugins/` — plugin components.
 - `hooks/` — hook scripts.
 - `agents/` — subagent definitions.
-- `apm-builder/` — transpiler and validation tooling.
 - `marketplace/` — published artifacts.
 
 ## Adding a new component
@@ -54,16 +43,14 @@ emits per-harness artifacts under `dist/` and `marketplace/`.
 1. Pick the right type directory.
 2. Follow the canonical schema documented in `TAXONOMY.md` and `CONVENTIONS.md`.
 3. Run `npm run validate` to verify schema compliance.
-4. Run `npm test` for any cross-cutting tests.
-5. Run `npm run build` to confirm the transpiler emits all six harness
+4. Run `npm run build` to confirm the transpiler emits all six harness
    variants without errors.
 
 ## Submitting changes
 
 1. Open a feature branch off `main`. Direct commits to `main` are not accepted.
-2. Run `npm run validate`, `npm test`, and `npm run typecheck` locally
-   before pushing.
-3. Open a PR; CI will re-run validation, tests, and typecheck.
+2. Run `npm run validate` locally before pushing.
+3. Open a PR; CI will re-run validation.
 
 ## Reporting issues
 

@@ -12,7 +12,7 @@ for v0.2 (`/profile validate`, `/profile diff`, JSON Schema, drift detail).
 ## Repository placement
 
 This plugin lives under `agent-config/plugins/` but is **harness-specific by design** —
-unlike sibling skill bundles, it has no `SKILL.md`, is not transpiled by `apm-builder`,
+unlike sibling skill bundles, it has no `SKILL.md`, is not transpiled by `suit-build`,
 and ships only a Claude Code shell (`commands/`, `hooks/`, `bin/mr-profile.mjs`). The
 core script (`bin/mr-profile.mjs`) is harness-agnostic Node ESM and could be invoked
 from a Cursor/Codex/Gemini hook in the future, but no such adapters ship today.

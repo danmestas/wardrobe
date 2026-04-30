@@ -39,7 +39,7 @@ If you have both `superpowers` and `bones-powers` installed and you're in a bone
 
 ## Multi-harness support
 
-v0.4 ships bones-powers across 6 harness targets via apm-builder:
+v0.4 ships bones-powers across 6 harness targets via [suit-build](https://github.com/danmestas/suit):
 
 - **claude-code** — primary target; full plugin (skills + hook + manifest)
 - **apm** — neutral package format

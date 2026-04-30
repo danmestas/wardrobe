@@ -32,7 +32,7 @@ A structured post-task critique. Inspired by the Reflexion pattern: the agent re
 
 Accepts `--mode <name>` (or `mode:` in the task frontmatter) to bias the
 critique toward a specific domain. The mode value is a *hint* for the agent:
-look up `apm-builder/modes/<name>.json` and weight the critique sections
+look up `modes/<name>/` and weight the critique sections
 toward that domain's `observation_types` and `memory_topics`. Examples:
 
 - `--mode code` — emphasize architecture, performance, refactor opportunities, test patterns.

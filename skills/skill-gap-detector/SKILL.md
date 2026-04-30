@@ -29,7 +29,7 @@ Surfaces *missing* skills, not edits to existing ones. Pairs with `evolution-eng
 Pass `--mode <name>` (or set `mode:` in task frontmatter) to bias the
 detector toward a specific domain. The mode value is a *hint*: when set, the
 agent should narrow its pattern matching to the domain's `observation_types`
-(see `apm-builder/modes/<name>.json`) and prefer drafting skills aligned with
+(see `modes/<name>/`) and prefer drafting skills aligned with
 the mode's `skills_priority` and `memory_topics`.
 
 Example: `--mode code` favors development-leaning gap proposals (test patterns,

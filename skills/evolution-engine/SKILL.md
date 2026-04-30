@@ -33,7 +33,7 @@ The split: meta-scout-style detection finds *what's wrong*; evolution-engine pro
 
 ## Usage
 
-Once `apm-builder evolve` ships:
+`suit-build evolve` runs via the repo's npm script:
 
 ```bash
 npm run evolve -- --since 7d --project agent-skills    # default: detect + propose
@@ -42,7 +42,7 @@ npm run evolve -- --include-arcs                       # include arc-driven prop
 npm run evolve -- --dry-run                            # detect but don't write report
 ```
 
-Until `apm-builder evolve` lands, run the underlying CLI directly:
+Or run the underlying detector CLI directly:
 
 ```bash
 npx evolution-engine patterns --json     # 12 signals as JSON

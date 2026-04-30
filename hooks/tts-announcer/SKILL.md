@@ -44,7 +44,7 @@ The hooks shell out to a Kokoro container (Docker). Install Kokoro once:
 docker run --name kokoro -d -p 8880:8880 ghcr.io/hexgrad/kokoro:latest
 ```
 
-Then enable the hook through `apm-builder build --target claude-code` (which emits the appropriate `.claude/settings.fragment.json` entries) or install manually with the legacy `install.sh` from the source repo.
+Then enable the hook through `suit-build build --target claude-code` (which emits the appropriate `.claude/settings.fragment.json` entries) or install manually with the legacy `install.sh` from the source repo.
 
 ## Voice + project naming
 
