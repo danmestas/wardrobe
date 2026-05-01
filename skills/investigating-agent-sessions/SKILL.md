@@ -1,6 +1,14 @@
 ---
 name: investigating-agent-sessions
+version: 0.1.0
 description: Use when debugging or auditing another Claude Code session, investigating what a prior agent did or left behind, reconstructing a failure that hit an earlier session, finding the cause of mystery state in a project (orphan processes, dirty files, broken hooks), or building context before continuing someone else's work
+type: skill
+targets:
+  - claude-code
+category:
+  primary: tooling
+  secondary:
+    - backpressure
 ---
 
 # Investigating Agent Sessions
