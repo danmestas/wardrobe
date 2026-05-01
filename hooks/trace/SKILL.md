@@ -62,7 +62,7 @@ The directory is created on the first PostToolUse event and is gitignored
 Tracking is disabled automatically for excluded directories
 (`~/.config`, `~/Downloads`, `~/Desktop`, `/tmp`, `/var`, plus any path listed
 in `.agent-config/exclude.json` or `~/.config/agent-config/exclude.json`).
-See [`apm-builder/lib/should-track.ts`](../../apm-builder/lib/should-track.ts).
+See the `should-track` logic in the [suit repo](https://github.com/danmestas/suit).
 
 To disable for a specific project that would otherwise be tracked, add the
 path to a project-local exclude file:

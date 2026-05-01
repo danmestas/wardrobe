@@ -6,7 +6,7 @@ This is a **one-time copy + diverge**. There is no automated resync from upstrea
 
 Set B (test-driven-development, systematic-debugging, verification-before-completion, requesting-code-review, receiving-code-review) added 2026-04-30 in v0.2.0.
 v0.3.0 (2026-04-30): added bones-native git push + PR flow to `finishing-a-bones-leaf`. Depends on `bones apply` subcommand (forthcoming bones release).
-v0.4.0 (2026-04-30): multi-harness support (codex/gemini/copilot/pi/apm) via apm-builder. Added tool-name mapping references for codex/gemini/copilot/pi. apm-builder discover.ts extended to walk plugin-bundled skills.
+v0.4.0 (2026-04-30): multi-harness support (codex/gemini/copilot/pi/apm) via suit-build. Added tool-name mapping references for codex/gemini/copilot/pi. suit-build discover.ts extended to walk plugin-bundled skills.
 
 ## Per-file provenance
 
@@ -44,7 +44,7 @@ v0.4.0 (2026-04-30): multi-harness support (codex/gemini/copilot/pi/apm) via apm
 | `skills/using-bones-powers/references/codex-tools.md` | upstream `references/codex-tools.md` if available, else newly authored | new — Claude Code → Codex tool name mapping |
 | `skills/using-bones-powers/references/gemini-tools.md` | newly authored from Gemini CLI docs | new — Claude Code → Gemini tool name mapping |
 | `skills/using-bones-powers/references/copilot-tools.md` | upstream `references/copilot-tools.md` if available, else newly authored | new — Claude Code → Copilot CLI tool name mapping |
-| `skills/using-bones-powers/references/pi-tools.md` | newly authored from Pi docs + apm-builder pi adapter conventions | new — Claude Code → Pi tool name mapping |
+| `skills/using-bones-powers/references/pi-tools.md` | newly authored from Pi docs + suit-build pi adapter conventions | new — Claude Code → Pi tool name mapping |
 
 **Skipped upstream files (Set B):** The following upstream files from `systematic-debugging/` are NOT copied — they are upstream meta/QA material, not user-facing skill content: `CREATION-LOG.md` (internal authoring history), `test-academic.md`, `test-pressure-1.md`, `test-pressure-2.md`, `test-pressure-3.md` (upstream skill QA/dogfood material).
 

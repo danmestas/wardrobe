@@ -95,7 +95,7 @@ is gitignored; nothing in it should be committed.
 
 ## Cross-harness contract
 
-Every hook ships through an adapter (see `apm-builder/lib/harness-adapters/`).
+Every hook ships through an adapter (adapter source lives in the [suit repo](https://github.com/danmestas/suit)).
 A hook script reads its input from stdin, writes JSON output to stdout, and
 exits 0. The adapter library normalizes the per-harness envelope so the same
 hook body works under Claude Code, Codex, Gemini, Copilot, and Pi when those
