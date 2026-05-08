@@ -83,6 +83,8 @@ What is **out of scope:**
 
 **Reference:** existing `outfits/backend/outfit.md` for frontmatter conventions.
 
+**Parallelism:** the 6 outfit files are mutually independent — no cross-references in their frontmatter or bodies. Fan out via `dispatching-parallel-agents`: one subagent per outfit file, batch in a single round. Reconvene at Step 1.7 (validation gate). See "## Parallelism & critical path" below for the full DAG.
+
 - [ ] **Step 1.1: Author `outfits/implementer/outfit.md`**
 
 ```markdown
@@ -323,6 +325,8 @@ cd /Users/dmestas/projects/wardrobe && git add outfits/{implementer,reviewer,pla
 
 **Reference:** existing `cuts/reviewing/cut.md` for frontmatter conventions; postural cuts (planning, reviewing, executing) stay alive — these are stack cuts, a new flavor.
 
+**Parallelism:** the 5 cut files are mutually independent. Same fan-out pattern as Task 1 — one subagent per file. Reconvene at Step 2.6.
+
 - [ ] **Step 2.1: Author `cuts/go-backend/cut.md`**
 
 ```markdown
@@ -494,6 +498,8 @@ cd /Users/dmestas/projects/wardrobe && git add cuts/{go-backend,ts-frontend,pyth
 - Create: `accessories/dagnats/accessory.md`
 
 **Reference:** existing `accessories/philosophy/accessory.md` for frontmatter conventions.
+
+**Parallelism:** the 3 accessory files are mutually independent. Fan out one subagent per file. Reconvene at Step 3.4.
 
 - [ ] **Step 3.1: Author `accessories/bones/accessory.md`**
 
@@ -1345,6 +1351,60 @@ Write a short post-mortem to `docs/plans/2026-05-08-orchestrator-driven-wardrobe
 - `category.secondary` tag selector — used in Task 8 (resolver) and the role outfit declarations in Task 1 (which set `category.secondary: [role]`). Consistent.
 - `--cmd` flag on `harness-spawn` — used in Task 11 (added) and Task 12 / Task 15 (consumed). Consistent.
 - Brief file path: `.scion/briefs/<task-id>-<role>.md` in Task 12; `.orchestrator/briefs/spy-serverdom-bones.md` in Task 15. Mismatch — Task 12 uses `.scion/`, Task 15 uses `.orchestrator/`. Resolved: the orchestrator-suit skill says `.scion/` if it exists else `<workspace>/.orchestrator/`. The serverdom workspace doesn't have `.scion/` (that's a darkish-factory thing), so Task 15 correctly falls through to `.orchestrator/`. Documented in Task 12 SKILL.md, no fix needed.
+
+---
+
+## Parallelism & critical path
+
+The plan reads top-down for the single-implementer case, but most of it parallelizes. If you have 2-3 implementers (or are using `dispatching-parallel-agents` to fan out subagents), here's the shape.
+
+### Cross-phase DAG
+
+    START ──┬── Phase 1 (14 parallel content files; Task 4 gate after)
+            │       └── outfits/quick waits for Phase 2 done
+            │
+            ├── Phase 2 ── Task 5 ──┬── 6 → 7 → 8 (sequential operator chain)
+            │                       └── Task 9 (parallel to 6-8)
+            │
+            ├── Phase 3 ── Task 11 (independent of all above)
+            │
+            ├── Phase 4 ── Task 12 (drafts now; testable post 1+3)
+            │
+            └── Phase 5 ── Tasks 13-14 (docs; can start now)
+
+                                                      ↓
+                                            All converge → Phase 6 (E2E proof)
+
+### What's parallel
+
+- **Phases 1, 2, 3 are entirely independent across repos.** Wardrobe content, suit composer, and agent-harness `--cmd` flag don't share state. Three implementers can ship them concurrently.
+- **Phases 4 and 5 can start immediately, before Phase 1 lands.** The orchestrator-suit skill and the AGENTS.md taxonomy section both describe the post-merge state — authoring them is independent of when the underlying content lands. They become *testable* end-to-end after Phases 1+3.
+- **Within Phase 1: 14 fully-independent file authorings** (6 outfits + 5 cuts + 3 accessories). Steps 1.1–1.6, 2.1–2.5, 3.1–3.3 are each one file, no cross-file dependencies. Use `dispatching-parallel-agents` — one subagent per file, batch in a single round. Recombine for the validation gates (Steps 1.7, 2.6, 3.4) and the Phase 1 merge.
+- **Within Phase 2: Task 9 is structurally independent of Tasks 6-8.** The hook-ordering lint is a separate module from the composer parser. Worker A on 6→7→8 (sequential operator chain), worker B on 9, both rejoin at Task 10.
+
+### What's sequential
+
+- **Phase 2's operator chain.** Task 5 (foundation: locate resolver + accept `compose:` field) must land first. Then Tasks 6 (`+`), 7 (`-` by name), 8 (`-` by tag) build on each other's parser. Don't try to parallelize 6/7/8 — the tokenizer they share would diverge.
+- **Validation gates are barriers.** Tasks 4, 10 each wait for their phase's content/code to land. Phase 6 is a hard barrier waiting for everything.
+- **The `quick` outfit (Step 1.6) waits for Phase 2.** Authoring the file in Phase 1 is fine; validation only passes once the composer accepts `compose:`. Phase 1 commits the other 5 outfits and defers `quick` to a Phase-2-merge follow-up commit.
+
+### Critical path
+
+`Task 5 → Task 6 → Task 7 → Task 8 → Task 10 → Task 15`. Suit composer is the bottleneck. Wardrobe content (Phase 1) and agent-harness `--cmd` (Phase 3) likely finish before Phase 2 does, even with one implementer per phase.
+
+### Wall-clock estimates
+
+- **1 implementer, linear:** 3-4 days.
+- **3 implementers parallel** — A on Phase 2 critical path, B on Phase 1 (fan-out via subagents), C on Phases 3+4+5 then converges on Phase 6 setup: **1.5-2 days wall-clock**, same total work.
+- **Phase 1 alone first as a v0.5 dry-run:** ~half a day with subagents. Defensible standalone — gives the cheapest validation that the role/stack split feels right before committing to suit composer code.
+
+### Recommended dispatch (3-implementer scenario)
+
+| Implementer | Phases | Notes |
+|---|---|---|
+| A (`slot: suit-typescript`) | 2 | Critical path. Start Task 5, then 6→7→8 sequential. Parallel-fork Task 9 once Task 5 lands. |
+| B (`slot: wardrobe-yaml`) | 1 → 4 → 5 | Phase 1 fanned out via subagents (14 files, single batch). Then drafts orchestrator-suit skill (Task 12) and docs (Tasks 13-14). |
+| C (`slot: agent-harness-bash` + integration) | 3 → 6 setup | Phase 3 first (independent of all). Idle until Phases 1, 2 land. Runs Phase 6 proof. |
 
 ---
 
