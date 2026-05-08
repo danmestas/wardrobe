@@ -34,6 +34,36 @@ harness adapter changes, taxonomy shifts. The format is loosely based on
   <project>." Tools with their own spy skill (e.g.
   `spy-on-bones-session`) keep precedence; this picks up everything
   else. Tagged `primary: evolution`, `secondary: [tooling, backpressure]`.
+- **Taxonomy v2: role / stack / accessory** — Phase 1+2+4+5 of the
+  orchestrator-driven wardrobe rollout (see
+  `docs/plans/2026-05-08-orchestrator-driven-wardrobe.md`). Adds:
+  - 6 role outfits (`implementer`, `reviewer`, `planner`, `spy`,
+    `orchestrator`, `quick`) — outfit now answers "who you are."
+    `quick` uses the new `compose:` field (suit ≥ 0.10.0) to union
+    implementer + planner + reviewer for solo flow.
+  - 5 stack cuts (`go-backend`, `ts-frontend`, `python-data`,
+    `infra-cloudflare`, `bones-tooling`) — cut now answers "what
+    tech stack."
+  - 3 project context accessories (`project-bones`,
+    `project-serverdom`, `project-dagnats`) — accessory now carries
+    "where you are." Prefix `project-` avoids name collision with
+    the existing `bones` outfit (suit's namespace is flat).
+  - `skills/orchestrator-suit` — documents the spawn loop the
+    orchestrator outfit relies on: receive intent → classify → spawn
+    role-shaped child via stateless `suit claude` piped through
+    `harness-spawn --cmd` → monitor → cherry-pick → escalate → audit
+    log. Briefs are saved artifacts under `.scion/briefs/` or
+    `<workspace>/.orchestrator/briefs/`. Brief wins on conflict with
+    the role outfit's standing instructions.
+  - AGENTS.md gains a "Taxonomy v2" section documenting the new axes
+    and the venn-diagram composition algebra. v1 domain outfits and
+    postural cuts stay alive untouched; deprecation is a follow-up
+    plan after 2-3 real orchestrated runs land.
+
+  Compatible with `@agent-ops/suit` ≥ 0.10.0 (which ships the
+  composer venn algebra: `+`, `-` by name, `-` by `tag:<name>`).
+  Phase 3 (agent-harness `--cmd` flag) and Phase 6 (E2E proof) ship
+  separately.
 
 ### Changed
 
