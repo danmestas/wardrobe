@@ -5,7 +5,5 @@ codex:
   agents_md_section_order: [rules, agents, skills]
 gemini:
   user_settings_path: "~/.gemini/settings.json"
-copilot:
-  hooks_dir: ".github/hooks"
 pi:
   package_keyword: "pi-package"
