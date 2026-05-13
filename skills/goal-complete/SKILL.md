@@ -4,6 +4,9 @@ version: 0.1.0
 targets: [claude-code]
 type: skill
 description: Use when you (the model pursuing a long-horizon goal stored in sesh's substrate) believe the objective has been achieved and want to mark the goal as `achieved`. Walks you through a mandatory completion audit BEFORE submitting `update_goal(complete)`. ONLY invoke when you are genuinely ready to claim completion — not as a routine status check. Triggers when you say "I think we're done", "this looks complete", "objective met", or when you are about to call sesh-ops goal complete.
+category:
+  primary: workflow
+  secondary: [integrations, backpressure]
 ---
 
 # Goal completion audit

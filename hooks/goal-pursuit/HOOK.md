@@ -1,5 +1,5 @@
 ---
-name: sesh-goal
+name: goal-pursuit
 version: 0.1.0
 description: >
   Two hooks for sesh's goal-management contract. Stop hook auto-accounts an
@@ -23,7 +23,7 @@ hooks:
     command: hooks/sesh-goal-session-context.sh
 ---
 
-# sesh-goal
+# goal-pursuit
 
 Wires a Claude Code session into [sesh's goal-management substrate](https://github.com/danmestas/sesh/blob/main/docs/goal-management.md). The hooks rely on three env vars:
 

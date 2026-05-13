@@ -4,6 +4,9 @@ version: 0.1.0
 targets: [claude-code, codex, pi, gemini]
 type: skill
 description: Use when you are a worker participating in a sesh goal pursuit (SESH_GOAL_ID is set in your environment) and need to find, claim, work on, or complete tasks linked to that goal. Covers the CAS pull protocol, goal-id filtering (pull-discipline so you don't poach tasks tagged to other goals), task state transitions, and how to surface partial progress to the operator. Triggers when you say "let me check the task queue", "pull the next task", "complete this task", "what's left to do", or when you boot into a session with SESH_GOAL_ID exported.
+category:
+  primary: workflow
+  secondary: [integrations]
 ---
 
 # Working with sesh tasks under a goal pursuit

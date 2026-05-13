@@ -14,7 +14,7 @@ include:
     - working-with-sesh-tasks
   rules: []
   hooks:
-    - sesh-goal
+    - goal-pursuit
   agents: []
   commands: []
 ---
