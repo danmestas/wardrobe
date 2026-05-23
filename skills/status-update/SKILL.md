@@ -1,5 +1,8 @@
 ---
 name: status-update
+version: 1.0.0
+type: skill
+targets: [claude-code, codex, gemini, pi]
 description: Format a status update, progress report, summary of work, or explanation of how concerns are being addressed — in plain prose suitable for handoff to a non-technical stakeholder. Use whenever the user asks for a status update, an explanation of work, a summary of what's been done, or how something is being addressed. The output should read like a confident pilot-engineer wrote it, not an AI.
 ---
 
