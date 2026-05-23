@@ -67,6 +67,7 @@ skill_include:
   - caveman-review
   - caveman-stats
   - cavecrew
+  - status-update
 skill_exclude:
   - golang-patterns
   - datastar

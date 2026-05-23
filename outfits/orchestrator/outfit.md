@@ -36,6 +36,7 @@ skill_include:
   - rtk-performance
   - rtk-ship
   - rtk-repo-recap
+  - status-update
 skill_exclude:
   - test-driven-development
   - executing-plans
