@@ -3,6 +3,8 @@ name: publish-html-page
 version: 1.0.0
 type: skill
 targets: [claude-code, codex, gemini, pi]
+category:
+  primary: integrations
 description: Publish a self-contained HTML file to a shareable encrypted Cloudflare-hosted artifact URL using html-artifact-publisher. Use when asked to upload, publish, share, or host a generated HTML page/artifact/explainer via artifacts.craftdesign.group or the HTML artifact publisher.
 ---
 
