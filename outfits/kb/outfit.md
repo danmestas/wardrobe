@@ -47,7 +47,7 @@ skill_include:
   - obsidian-canvas
   - vault-autoresearch
   - defuddle
-  - knowledge-base-overview
+  - vault-overview
   - rtk-triage
   - rtk-tdd
   - rtk-tdd-rust

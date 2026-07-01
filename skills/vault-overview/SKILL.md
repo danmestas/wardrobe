@@ -1,6 +1,6 @@
 ---
 name: vault-overview
-version: 0.1.0
+version: 0.2.0
 description: >
   Claude + Obsidian knowledge companion. Sets up a persistent wiki vault,
   scaffolds structure from a one-sentence description, and routes to specialized
@@ -27,36 +27,33 @@ The key difference from RAG: the wiki is a persistent artifact. Cross-references
 
 ## Architecture
 
-Three layers:
+A vault has four top-level buckets plus the wiki:
 
 ```
 vault/
-├── .raw/       # Layer 1: immutable source documents
-├── wiki/       # Layer 2: LLM-generated knowledge base
-└── CLAUDE.md   # Layer 3: schema and instructions (this plugin)
+├── raw/           # inbox — drop new sources here for processing; drains as they are ingested
+├── wiki/          # the LLM-generated knowledge base (the interface)
+│   ├── index.md   # master catalog — updated on every ingest
+│   ├── log.md     # append-only operations log — newest entry at TOP
+│   ├── hot.md     # hot cache (~500-word recent context)
+│   ├── overview.md
+│   ├── sources/   # one summary page per ingested source
+│   ├── entities/  # people, orgs, products, repos
+│   ├── concepts/  # ideas, patterns, frameworks, algorithms
+│   ├── domains/   # top-level topic areas
+│   ├── comparisons/
+│   ├── questions/
+│   └── meta/      # dashboards, lint reports, conventions
+├── _sources/      # the ORIGINAL source documents, archived after ingest (reference; rarely opened)
+│   └── <category>/  # organise by kind: articles/, research/, specs/, notes/, ...
+├── _archive/      # large or low-value files excluded from active search and ingest
+├── _templates/    # note templates
+└── CLAUDE.md      # schema + conventions (this file, at the vault root)
 ```
 
-Standard wiki structure:
+**Lifecycle.** A source is dropped in `raw/` → ingested (which creates its `wiki/sources/` summary plus `entities/` and `concepts/` pages) → the original file is then MOVED out of `raw/` into `_sources/<category>/` (or `_archive/` if it is large or low-value). `raw/` is an inbox, not permanent storage: it should be empty once everything is processed. The `wiki/` is the interface you read and query; `_sources/` is the reference archive of originals, opened only to re-check a claim.
 
-```
-wiki/
-├── index.md            # master catalog of all pages
-├── log.md              # chronological record of all operations
-├── hot.md              # hot cache: recent context summary (~500 words)
-├── overview.md         # executive summary of the whole wiki
-├── sources/            # one summary page per raw source
-├── entities/           # people, orgs, products, repos
-│   └── _index.md
-├── concepts/           # ideas, patterns, frameworks
-│   └── _index.md
-├── domains/            # top-level topic areas
-│   └── _index.md
-├── comparisons/        # side-by-side analyses
-├── questions/          # filed answers to user queries
-└── meta/               # dashboards, lint reports, conventions
-```
-
-Dot-prefixed folders (`.raw/`) are hidden in Obsidian's file explorer and graph view. Use this for source documents.
+Underscore-prefixed folders (`_sources/`, `_archive/`, `_templates/`) sort to the top and hold non-wiki material. `raw/` is intentionally visible (not a dot-folder) so its inbox state is obvious in any editor.
 
 ---
 
@@ -153,17 +150,18 @@ Created: YYYY-MM-DD
 
 - All notes use YAML frontmatter: type, status, created, updated, tags (minimum)
 - Wikilinks use [[Note Name]] format: filenames are unique, no paths needed
-- .raw/ contains source documents: never modify them
+- raw/ is an inbox: after ingest the original moves to _sources/<category>/ (or _archive/); raw/ ends empty
+- _sources/ and _archive/ hold the immutable original documents: never modify them
 - wiki/index.md is the master catalog: update on every ingest
 - wiki/log.md is append-only: never edit past entries
 - New log entries go at the TOP of the file
 
 ## Operations
 
-- Ingest: drop source in .raw/, say "ingest [filename]"
+- Ingest: drop source in raw/, say "ingest [filename]"
 - Query: ask any question: Claude reads index first, then drills in
 - Lint: say "lint the wiki" to run a health check
-- Archive: move cold sources to .archive/ to keep .raw/ clean
+- Archive: large/low-value sources go to _archive/ instead of being ingested
 ```
 
 ---
@@ -203,6 +201,6 @@ Your job as the LLM:
 4. Maintain hot cache after every operation
 5. Always update index, sub-indexes, log, and hot cache on changes
 6. Always use frontmatter and wikilinks
-7. Never modify .raw/ sources
+7. Never modify raw/ sources
 
 The human's job: curate sources, ask good questions, think about what it means. Everything else is on you.

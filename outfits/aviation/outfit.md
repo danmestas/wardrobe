@@ -37,7 +37,7 @@ skill_include:
   - brainstorming
   - subagent-driven-development
   - systematic-debugging
-  - knowledge-base-overview
+  - vault-overview
   - obsidian-markdown
   - vault-autoresearch
   - apple-contacts
@@ -80,7 +80,7 @@ include:
 # Aviation Outfit
 
 For Flight-Planner, NOTAMOrganizer, NotamsApi, preflightapi.backend, and
-flight-planner-kb. Force-loads the core4 plus `knowledge-base-overview`,
+flight-planner-kb. Force-loads the core4 plus `vault-overview`,
 `obsidian-markdown`, `vault-autoresearch` (for charts/regs lookups, staging
 into the vault for ingestion), and `apple-contacts` (for crew/ATC contact
 lookups). Memory of plans and briefings, KB-leaning. Excludes coding-language

@@ -1,6 +1,6 @@
 ---
 name: vault-ingest
-version: 0.1.0
+version: 0.2.0
 description: >-
   Ingest sources into the Obsidian wiki vault. Reads a source, extracts entities
   and concepts, creates or updates wiki pages, cross-references, and logs the
@@ -11,31 +11,31 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: memory-management
+  primary: context-management
 ---
 
 # wiki-ingest: Source Ingestion
 
 Read the source. Write the wiki. Cross-reference everything. A single source typically touches 8-15 wiki pages.
 
-**Syntax standard**: Write all Obsidian Markdown using proper Obsidian Flavored Markdown. Wikilinks as `[[Note Name]]`, callouts as `> [!type] Title`, embeds as `![[file]]`, properties as YAML frontmatter. If the kepano/obsidian-skills plugin is installed, prefer its canonical obsidian-markdown skill for Obsidian syntax reference. Otherwise, follow the guidance in this skill.
+**Syntax standard**: Write all Obsidian Markdown using proper Obsidian Flavored Markdown. Wikilinks as `[[Note Name]]`, callouts as `> [!type] Title`, embeds as `![[file]]`, properties as YAML frontmatter. If the kepano/obsidian-skills plugin is installed, prefer its canonical Obsidian Markdown reference for syntax guidance. Otherwise, follow the guidance in this skill.
 
 ---
 
 ## Delta Tracking
 
-Before ingesting any file, check `.raw/.manifest.json` to avoid re-processing unchanged sources.
+Before ingesting any file, check `raw/.manifest.json` to avoid re-processing unchanged sources.
 
 ```bash
 # Check if manifest exists
-[ -f .raw/.manifest.json ] && echo "exists" || echo "no manifest yet"
+[ -f raw/.manifest.json ] && echo "exists" || echo "no manifest yet"
 ```
 
 **Manifest format** (create if missing):
 ```json
 {
   "sources": {
-    ".raw/articles/article-slug-2026-04-08.md": {
+    "raw/articles/article-slug-2026-04-08.md": {
       "hash": "abc123",
       "ingested_at": "2026-04-08",
       "pages_created": ["wiki/sources/article-slug.md", "wiki/entities/Person.md"],
@@ -68,14 +68,14 @@ Steps:
 1. **Fetch** the page using WebFetch.
 2. **Clean** (optional): if `defuddle` is available (`which defuddle 2>/dev/null`), run `defuddle [url]` to strip ads, nav, and clutter. Typically saves 40-60% tokens. Fall back to raw WebFetch output if not installed.
 3. **Derive slug** from the URL path (last segment, lowercased, spaces→hyphens, strip query strings).
-4. **Save** to `.raw/articles/[slug]-[YYYY-MM-DD].md` with a frontmatter header:
+4. **Save** to `raw/articles/[slug]-[YYYY-MM-DD].md` with a frontmatter header:
    ```markdown
    ---
    source_url: [url]
    fetched: [YYYY-MM-DD]
    ---
    ```
-5. Proceed with **Single Source Ingest** starting at step 2 (file is now in `.raw/`).
+5. Proceed with **Single Source Ingest** starting at step 2 (file is now in `raw/`).
 
 ---
 
@@ -87,7 +87,7 @@ Steps:
 
 1. **Read** the image file using the Read tool. Claude can process images natively.
 2. **Describe** the image contents: extract all text (OCR), identify key concepts, entities, diagrams, and data visible in the image.
-3. **Save** the description to `.raw/images/[slug]-[YYYY-MM-DD].md`:
+3. **Save** the description to `raw/images/[slug]-[YYYY-MM-DD].md`:
    ```markdown
    ---
    source_type: image
@@ -107,7 +107,7 @@ Use cases: whiteboard photos, screenshots, diagrams, infographics, document scan
 
 ## Single Source Ingest
 
-Trigger: user drops a file into `.raw/` or pastes content.
+Trigger: user drops a file into `raw/` or pastes content.
 
 Steps:
 
@@ -123,13 +123,15 @@ Steps:
 10. **Append** to `wiki/log.md` (new entries at the TOP):
     ```markdown
     ## [YYYY-MM-DD] ingest | Source Title
-    - Source: `.raw/articles/filename.md`
+    - Source: `raw/articles/filename.md`
     - Summary: [[Source Title]]
     - Pages created: [[Page 1]], [[Page 2]]
     - Pages updated: [[Page 3]], [[Page 4]]
     - Key insight: One sentence on what is new.
     ```
 11. **Check for contradictions.** If new info conflicts with existing pages, add `> [!contradiction]` callouts on both pages.
+12. **Move the original out of the inbox.** After the wiki pages are written, move the source file from `raw/` to `_sources/<category>/` (choose the category subfolder by kind — `articles/`, `research/`, `specs/`, `notes/`, ...), or to `_archive/` if it is large (>100 KB) or low-value. `raw/` is an inbox and should end empty once everything is processed.
+13. **Sync the qkb index.** Run `qkb update` so BM25, graph link extraction, and the question-cache used by `vault-query-qkb` pick up everything you just wrote. See **Index Sync** below.
 
 ---
 
@@ -144,6 +146,7 @@ Steps:
 3. After all sources: do a cross-reference pass. Look for connections between the newly ingested sources.
 4. Update index, hot cache, and log once at the end (not per-source).
 5. Report: "Processed N sources. Created X pages, updated Y pages. Here are the key connections I found."
+6. **Sync the qkb index once at the end** (not per-source). See **Index Sync** below.
 
 Batch ingest is less interactive. For 30+ sources, expect significant processing time. Check in with the user after every 10 sources.
 
@@ -206,10 +209,57 @@ Obsidian resolves wikilinks by matching the **exact filename** (without extensio
 
 ---
 
+## Index Sync
+
+After every ingest (single or batch), the qkb retrieval index needs to know about the new/changed pages. Run this once at the end of the ingest:
+
+```bash
+qkb update
+```
+
+What this does:
+- **Walks the vault** and diffs file content hashes against the index — only changed/new files get re-processed.
+- **Rebuilds BM25** entries for changed docs so lexical search picks them up.
+- **Auto-runs `graph link`** internally — extracts `[[wikilinks]]`, `![[embeds]]`, and frontmatter `type`s into the typed graph (LINKS_TO / EMBEDS / REFERENCES edges). This is what the `--graph` retrieval mode in `vault-query-qkb` relies on.
+- **Idempotent**: re-running with no vault changes is a near-instant no-op.
+
+Latency: typically 1–5 seconds for a handful of new pages, 30–60 seconds for a batch of 50+ new files. Print the line to the user so they can confirm freshness.
+
+### Vector embeddings (the slow step) — NOT automatic
+
+`qkb update` only refreshes lexical + graph state. New vector embeddings for the new docs are a separate, slower step (uses local LLM, 5–15 minutes for 100+ docs):
+
+```bash
+qkb embed
+```
+
+Do NOT run `embed` automatically inside the ingest skill. Two reasons:
+
+1. **Lexical + graph alone is usually enough.** The reranker in `qkb query` scores against fresh chunk text from the FTS5 index regardless of vector freshness, so newly-ingested docs still surface correctly on most queries. They're slightly weaker on pure-semantic matches until embeddings catch up.
+2. **It's heavy.** A user doing 20 small ingests across a session shouldn't trigger 20 model-load + embed cycles.
+
+Instead, after the ingest report, **suggest** to the user:
+
+> "Lexical + graph synced. Run `qkb embed` when you want the new pages' vectors caught up (5-15 min, optional)."
+
+### When `qkb update` fails
+
+Don't block the ingest report on this. If `qkb update` returns non-zero:
+
+- Log the error briefly: "qkb index sync failed: <one-line>. Ingest itself succeeded; retry with `qkb update` once resolved."
+- Continue with the rest of the ingest output.
+
+Common causes: qkb not on PATH (user hasn't installed `@agent-ops/qkb` globally), GraphQLite extension missing, or a transient SQLite lock from a running MCP daemon.
+
+---
+
 ## What Not to Do
 
-- Do not modify anything in `.raw/`. These are immutable source documents.
+- `raw/` is an inbox: after processing, move the original to `_sources/<category>/` (or `_archive/`), leaving `raw/` empty. Do not treat `raw/` as permanent storage.
+- Do not modify the archived originals in `_sources/` or `_archive/`. Those are the immutable source documents.
 - Do not create duplicate pages. Always check the index and search before creating.
 - Do not skip the log entry. Every ingest must be recorded.
 - Do not skip the hot cache update. It is what keeps future sessions fast.
+- Do not skip the qkb index sync. Future `vault-query-qkb` calls will miss what you just wrote.
 - Do not use kebab-case filenames for entities, concepts, domains, comparisons, or questions. These must match wikilink text exactly (Title Case with spaces).
+- Do not run `qkb embed` automatically inside an ingest. Suggest it; let the user trigger.
