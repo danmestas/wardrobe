@@ -41,13 +41,14 @@ skill_include:
   - vault-overview
   - vault-ingest
   - vault-query
+  - vault-query-bm25
+  - vault-query-graph
   - vault-save
   - vault-lint
   - obsidian-bases
   - obsidian-canvas
   - vault-autoresearch
   - defuddle
-  - knowledge-base-overview
   - rtk-triage
   - rtk-tdd
   - rtk-tdd-rust

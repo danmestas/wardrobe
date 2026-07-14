@@ -3,7 +3,7 @@ name: vault-autoresearch
 version: 0.2.0
 description: >-
   Use when iteratively researching a topic and filing the synthesis into an
-  Obsidian vault for later ingestion. Output goes to `<vault>/.raw/` (NOT
+  Obsidian vault for later ingestion. Output goes to `<vault>/raw/` (NOT
   directly into wiki pages) so that `vault-ingest` can process it on its own
   schedule. Triggers: '/vault-autoresearch', 'autoresearch [topic]', 'research
   [topic] into the vault', 'deep dive into [topic]', 'find everything about
@@ -19,12 +19,12 @@ category:
 
 # vault-autoresearch: Iterative Research, Staged for Ingestion
 
-You are a research agent. You take a topic, run iterative web searches, synthesize findings, and **stage the raw output under `<vault>/.raw/`** for later ingestion. You do NOT write directly to wiki pages — that's `vault-ingest`'s job, on its own schedule.
+You are a research agent. You take a topic, run iterative web searches, synthesize findings, and **stage the raw output under `<vault>/raw/`** for later ingestion. You do NOT write directly to wiki pages — that's `vault-ingest`'s job, on its own schedule.
 
 This is the separation of concerns:
 
-- **vault-autoresearch produces material.** Web searches, fetches, synthesis. Output lands in `<vault>/.raw/<topic-slug>/`.
-- **vault-ingest produces wiki pages.** Reads `.raw/`, decides what becomes a source page / concept page / entity page, places into `wiki/sources/`, `wiki/concepts/`, `wiki/entities/`, `wiki/questions/`.
+- **vault-autoresearch produces material.** Web searches, fetches, synthesis. Output lands in `<vault>/raw/<topic-slug>/`.
+- **vault-ingest produces wiki pages.** Reads `raw/`, decides what becomes a source page / concept page / entity page, places into `wiki/sources/`, `wiki/concepts/`, `wiki/entities/`, `wiki/questions/`.
 
 Don't conflate the two. If you find yourself writing to `wiki/` directly, stop — that's vault-ingest's surface, not yours.
 
@@ -61,9 +61,9 @@ Max rounds: 3 (per program.md). Stop when depth is reached or max rounds hit.
 
 ---
 
-## Filing to `.raw/`
+## Filing to `raw/`
 
-Output goes to `<vault>/.raw/<topic-slug>/`. Slug the topic (lowercase, hyphens, no punctuation): "Karpathy autoresearch pattern" -> `karpathy-autoresearch-pattern`.
+Output goes to `<vault>/raw/<topic-slug>/`. Slug the topic (lowercase, hyphens, no punctuation): "Karpathy autoresearch pattern" -> `karpathy-autoresearch-pattern`.
 
 Inside the topic directory, write one markdown file per fetched source plus one synthesis file. Each file carries frontmatter so vault-ingest can parse it:
 
@@ -90,7 +90,7 @@ not paraphrase the whole page — capture the load-bearing claims and quote
 key passages verbatim where they matter.}
 ```
 
-The synthesis file is `<vault>/.raw/<topic-slug>/_synthesis.md` (underscore prefix sorts it first):
+The synthesis file is `<vault>/raw/<topic-slug>/_synthesis.md` (underscore prefix sorts it first):
 
 ```markdown
 ---
@@ -131,13 +131,13 @@ References between raw files are by **filename**, not wikilink syntax — wikili
 
 ## After Filing
 
-Append a one-line breadcrumb to `<vault>/.raw/_log.md` (create if missing):
+Append a one-line breadcrumb to `<vault>/raw/_log.md` (create if missing):
 
 ```
 ## [YYYY-MM-DD HH:MM] vault-autoresearch | <topic>
 - Run: <run-id>
 - Rounds: N | Sources: N
-- Path: .raw/<topic-slug>/
+- Path: raw/<topic-slug>/
 - Status: ready-for-ingest
 ```
 
@@ -153,7 +153,7 @@ Research staged: <topic>
 Rounds: N | Searches: N | Sources fetched: N
 
 Staged at:
-  <vault>/.raw/<topic-slug>/
+  <vault>/raw/<topic-slug>/
     _synthesis.md
     <source-1>.md
     <source-2>.md
@@ -185,4 +185,4 @@ If a constraint conflicts with completeness, respect the constraint and note wha
 
 ## FUTURE WORK
 
-This skill needs work — the output schema for `.raw/` files isn't fully formalized, and `vault-ingest` handles it loosely today. Iterate as the pipeline matures. In particular: the `key_claims` shape, how to encode source-of-source links between raw files, and whether `_synthesis.md` should be one file or split per round are all open questions. The shape above is the current best guess, not the final answer.
+This skill needs work — the output schema for `raw/` files isn't fully formalized, and `vault-ingest` handles it loosely today. Iterate as the pipeline matures. In particular: the `key_claims` shape, how to encode source-of-source links between raw files, and whether `_synthesis.md` should be one file or split per round are all open questions. The shape above is the current best guess, not the final answer.

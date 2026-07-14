@@ -12,7 +12,7 @@ type: skill
 targets:
   - claude-code
 category:
-  primary: memory-management
+  primary: context-management
 ---
 
 # save: File Conversations Into the Wiki
@@ -74,7 +74,7 @@ status: developing
 related:
   - "[[Any Wiki Page Mentioned]]"
 sources:
-  - "[[.raw/source-if-applicable.md]]"
+  - "[[raw/source-if-applicable.md]]"
 ---
 ```
 
